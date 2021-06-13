@@ -3,16 +3,20 @@ import { Chips } from 'primereact/chips'
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
+import { insertMatchDetails } from '../redux';
+import { connect } from 'react-redux';
+import { useHistory } from "react-router-dom";
 
-function MatchDetails() {
+function MatchDetails({ insertMatchDetails }) {
 
     const [firstTeamName, setFirstTeamName] = useState('');
     const [secondTeamName, setSecondTeamName] = useState('');
     const [matchType, setMatchType] = useState('ODM');
-    const [totalOvers, setTotalOvers] = useState(0);
+    const [totalOversInOneInning, setTotalOvers] = useState(0);
     const [firstTeamPlayers, setFirstTeamPlayers] = useState([]);
     const [secondTeamPlayers, setSecondTeamPlayers] = useState([]);
     const [tossResult, setTossResult] = useState(null);
+    let history = useHistory();
 
     let matchTypes = [
         { name: 'One Day Match', value: 'ODM' },
@@ -22,14 +26,23 @@ function MatchDetails() {
     let oversOptions = Array.from(Array(50).keys()).map((i) => { return { name: i + 1, value: i + 1 } });
 
     let tossResultOptions = [
-        { name: firstTeamName + ' won the toss and elected to bat first', value: 1 },
-        { name: firstTeamName + ' won the toss and elected to bowl first', value: 2 },
-        { name: secondTeamName + ' won the toss and elected to bat first', value: 3 },
-        { name: secondTeamName + ' won the toss and elected to bowl first', value: 4 }
+        { name: firstTeamName + ' won the toss and elected to bat first', value: 11 },
+        { name: firstTeamName + ' won the toss and elected to bowl first', value: 10 },
+        { name: secondTeamName + ' won the toss and elected to bat first', value: 21 },
+        { name: secondTeamName + ' won the toss and elected to bowl first', value: 20 }
     ];
 
     const setMatchDetails = () => {
-        console.table(firstTeamName, secondTeamName, matchType, totalOvers, firstTeamPlayers, secondTeamPlayers, tossResult);
+        insertMatchDetails({
+            firstTeamName: firstTeamName,
+            secondTeamName: secondTeamName,
+            matchType: matchType,
+            totalOversInOneInning: totalOversInOneInning,
+            firstTeamPlayers: firstTeamPlayers,
+            secondTeamPlayers: secondTeamPlayers,
+            tossResult: tossResult
+        });
+        history.push('update-score');
     }
 
     return (
@@ -49,7 +62,7 @@ function MatchDetails() {
                 </div>
                 <div className="p-field p-col-12 p-md-4">
                     <label htmlFor="overs">No. of Overs</label>
-                    <Dropdown inputId="overs" value={totalOvers} options={oversOptions} onChange={(e) => setTotalOvers(e.value)} placeholder="Select" optionLabel="name" />
+                    <Dropdown inputId="overs" value={totalOversInOneInning} options={oversOptions} onChange={(e) => setTotalOvers(e.value)} placeholder="Select" optionLabel="name" />
                 </div>
                 <div className="p-field p-col-12 p-md-4">
                     <label htmlFor="tossResult">Toss Result</label>
@@ -71,4 +84,10 @@ function MatchDetails() {
     )
 }
 
-export default MatchDetails
+const mapStateToDispatch = (dispatch) => {
+    return {
+        insertMatchDetails: (details) => dispatch(insertMatchDetails(details))
+    }
+}
+
+export default connect(null, mapStateToDispatch)(MatchDetails);
