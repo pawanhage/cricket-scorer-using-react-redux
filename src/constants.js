@@ -13,3 +13,6 @@ export const YET_TO_BAT = 'YTB';
 export const NOT_OUT = 'NO';
 export const OUT = 'O';
 export const RETD_HURT = 'RETD_HURT';
+
+export const ONE_DAY_MATCH = 'ODM';
+export const TEST_MATCH = 'TM';

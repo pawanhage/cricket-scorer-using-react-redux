@@ -14,22 +14,18 @@ function UpdateScore({
             nonStrikerBatsmanDetails,
             batsmenYetToBatOrRetdHurtOrNotOut,
             batsmenNotOut,
-            nextPossibleBowlers
+            nextPossibleBowlers,
+            currentBowlerName,
+            wicketsGone
         }) {
 
     const [batsmanOnStrike, setBatsmanOnStrike] = useState(strikerBatsmanDetails);
     const [batsmanOnNonStrike, setBatsmanOnNonStrike] = useState(nonStrikerBatsmanDetails);
-    const [currentBowler, setCurrentBowler] = useState(currentBowlerDetails);
+    const [currentBowler, setCurrentBowler] = useState(currentBowlerName);
     const [nextBatsman, setNextBatsman] = useState(null);
 
     let batsmenYetToBatOrRetdHurtOptions = [
         batsmenYetToBatOrRetdHurt.map(batsman => {
-            return { label: batsman.name, value: batsman }
-        })
-    ];
-
-    let batsmenYetToBatOrRetdHurtOrNotOutOptions = [
-        batsmenYetToBatOrRetdHurtOrNotOut.map(batsman => {
             return { label: batsman.name, value: batsman }
         })
     ];
@@ -46,7 +42,7 @@ function UpdateScore({
         })
     ];
 
-    const chooseBatsman = () => {
+    const ChooseBatsman = () => {
         if (batsmenYetToBatOrRetdHurt.length === firstTeamPlayers.length) {
             return (
                 <Card subTitle="Choose Batsman">
@@ -61,7 +57,7 @@ function UpdateScore({
                     </div>
                 </Card>
             )
-        } else {
+        } else if (wicketsGone !== firstTeamPlayers.length - 1) {
             return (
                 <Card subTitle="Choose Batsman">
                     {/* Choose Batsman after wicket gone */}
@@ -83,10 +79,12 @@ function UpdateScore({
                     </div>
                 </Card>
             )
+        } else {
+            return <></>
         }
     }
 
-    const chooseCurrentBowler = () => {
+    const ChooseCurrentBowler = () => {
         return (
             <Card subTitle="Choose Bowler">
                 {/* Choose Bowler after over */}
@@ -110,7 +108,8 @@ function UpdateScore({
                 </div>
                 <div className="p-col-4">
                     <Card title="Update Score" subTitle="Ball by Ball Scoring">
-                        
+                        {ChooseBatsman}
+                        {ChooseCurrentBowler}
                     </Card>
                 </div>
             </div>
@@ -123,7 +122,8 @@ const mapStateToProps = (state) => {
         firstTeamPlayers: state.match.details.firstTeamPlayers,
         secondTeamPlayers: state.match.details.secondTeamPlayers,
         innings: state.match.details.innnings,
-        batsmenYetToBatOrRetdHurt: batsmenYetToBatOrRetdHurt(state.match.innings)
+        batsmenYetToBatOrRetdHurt: batsmenYetToBatOrRetdHurt(state.match),
+
     }
 }
 
