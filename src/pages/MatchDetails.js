@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Chips } from 'primereact/chips'
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
@@ -6,7 +6,8 @@ import { Dropdown } from 'primereact/dropdown';
 import { insertMatchDetails, updateInnings } from '../redux';
 import { connect } from 'react-redux';
 import { useHistory } from "react-router-dom";
-import { ONE_DAY_MATCH, TEST_MATCH, YET_TO_BAT } from '../constants';
+import { ONE_DAY_MATCH, TEST_MATCH } from '../constants';
+import { formInning } from '../utils';
 
 function MatchDetails({ insertMatchDetails, updateInnings }) {
 
@@ -16,27 +17,10 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
     const [totalOversInOneInning, setTotalOvers] = useState(5);
     const [firstTeamPlayers, setFirstTeamPlayers] = useState(['Rohit', 'Pandya', 'Pollard', 'SKY', 'Boult']);
     const [secondTeamPlayers, setSecondTeamPlayers] = useState(['MSD', 'Faf', 'Jadeja', 'Raina', 'Sam']);
-    const [tossResult, setTossResult] = useState(11);
+    const [tossResult, setTossResult] = useState(12);
     const [maxOversPerBowler, setMaxOversPerBowler] = useState(1);
-    const [battingTeamOrder, setBattingTeamOrder] = useState(null);
-    const [bowlingTeamOrder, setBowlingTeamOrder] = useState(null);
 
     let history = useHistory();
-
-    useEffect(() => {
-        if (tossResult === 11 || tossResult === 20) {
-            setBattingTeamOrder([firstTeamPlayers, secondTeamPlayers]);
-            setBowlingTeamOrder([secondTeamPlayers, firstTeamPlayers]);
-        } else {
-            setBattingTeamOrder([secondTeamPlayers, firstTeamPlayers]);
-            setBattingTeamOrder([firstTeamPlayers, secondTeamPlayers]);
-        }
-
-        if (matchType === TEST_MATCH) {
-            setBattingTeamOrder([...battingTeamOrder, ...battingTeamOrder]);
-            setBowlingTeamOrder([...bowlingTeamOrder, ...bowlingTeamOrder]);
-        }
-    }, [firstTeamPlayers, secondTeamPlayers, tossResult, matchType]);
 
     let matchTypes = [
         { name: 'One Day Match', value: ONE_DAY_MATCH },
@@ -46,57 +30,42 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
     let oversOptions = Array.from(Array(50).keys()).map((i) => { return { name: i + 1, value: i + 1 } });
 
     let tossResultOptions = [
-        { name: firstTeamName + ' won the toss and elected to bat first', value: 11 },
-        { name: firstTeamName + ' won the toss and elected to bowl first', value: 10 },
+        { name: firstTeamName + ' won the toss and elected to bat first', value: 12 },
+        { name: firstTeamName + ' won the toss and elected to bowl first', value: 21 },
         { name: secondTeamName + ' won the toss and elected to bat first', value: 21 },
-        { name: secondTeamName + ' won the toss and elected to bowl first', value: 20 }
+        { name: secondTeamName + ' won the toss and elected to bowl first', value: 12 }
     ];
 
     let maxOversPerBowlerOptions = Array.from(Array(10).keys()).map((i) => { return { name: i + 1, value: i + 1 } });
 
     const setMatchDetails = () => {
-        let innings = [];
-        let totalInnings = matchType === ONE_DAY_MATCH ? 2 : 4;
-        for (let i = 0; i < totalInnings; i++) {
-            innings.push({
-                score: 0,
-                wickets: 0,
-                extras: 0,
-                batsmen: battingTeamOrder[i].map((player) => {
-                    return {
-                        name: player,
-                        status: YET_TO_BAT,
-                        runsScored: 0,
-                        ballsFaced: 0,
-                        fours: 0,
-                        six: 0,
-                        wicketDetails: null
-                    }
-                }),
-                bowlers: bowlingTeamOrder[i].map((player) => {
-                    return {
-                        name: player,
-                        overs: 0,
-                        wicketsTaken: 0,
-                        runsGiven: 0,
-                        maiden: 0,
-                        economy: 0,
-                        overNumbers: null
-                    }
-                }),
-                overs: []
-            });
-        }
         insertMatchDetails({
-            firstTeamName: firstTeamName,
-            secondTeamName: secondTeamName,
+            teams: [
+                {
+                    name: firstTeamName,
+                    players: firstTeamPlayers
+                },
+                {
+                    name: secondTeamName,
+                    players: secondTeamPlayers
+                }
+            ],
             matchType: matchType,
             totalOversInOneInning: totalOversInOneInning,
-            firstTeamPlayers: firstTeamPlayers,
-            secondTeamPlayers: secondTeamPlayers,
             tossResult: tossResult,
-            maxOversPerBowler: maxOversPerBowler
+            maxOversPerBowler: maxOversPerBowler,
+            totalPlayersInEachTeam: firstTeamPlayers.length
         });
+        let innings = [];
+        let battingTeam = tossResult === 12 ? firstTeamName : secondTeamName;
+        let battingTeamPlayers = tossResult === 12 ? firstTeamPlayers : secondTeamPlayers;
+        let bowlingTeam = tossResult === 12 ? secondTeamName : firstTeamName;
+        let bowlingTeamPlayers = tossResult === 12 ? secondTeamPlayers : firstTeamPlayers;
+
+        innings.push(formInning(battingTeam, battingTeamPlayers, bowlingTeam, bowlingTeamPlayers));
+        if (matchType === ONE_DAY_MATCH) {
+            innings.push(formInning(bowlingTeam, bowlingTeamPlayers, battingTeam, battingTeamPlayers));
+        }
         updateInnings(innings);
         history.push('update-score');
     }

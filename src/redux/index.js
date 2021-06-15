@@ -1,4 +1,4 @@
-import { NOT_OUT, RETD_HURT, YET_TO_BAT } from "../constants";
+import { NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RETD_HURT, YET_TO_BAT } from "../constants";
 
 export const INSERT_MATCH_DETALS = 'INSERT_MATCH_DETAILS';
 export const UPDATE_INNINGS = 'UPDATE_INNINGS';
@@ -12,14 +12,13 @@ export const RESET_LAST_BALL = 'RESET_LAST_BALL';
 //         score: 100,
 //         wickets: 4,
 //         extras: 21,
+//         battingTeam: 
+//         bowlingTeam:
 //         batsmen: [
 //             {
 //                 name:
 //                 status:
-//                 runsScored:
-//                 ballsFaced:
-//                 fours:
-//                 six:
+//                 runsScored: [1, 0, 3, 4, 0]
 //                 wicketDetails: {
 //                     type:
 //                     runOutBy ?:
@@ -32,63 +31,58 @@ export const RESET_LAST_BALL = 'RESET_LAST_BALL';
 //         bowlers: [
 //         {
 //             name:
-//             overs:
+//             totalOvers:
 //             wicketsTaken:
 //             runsGiven:
 //             maiden:
-//             economy:
-//             overNumbers: [1]
 //         }
 //         ],
-//         overs: [
-//                  {
-//                   overDetail: ['1', '1Wd', '0', '0', '1', '0', '0'],
-//                   bowlerName: 
-//                   }
-//               ]
-//       }
+//         overs: [{details: ['1', '1WD', '0', '0', '1', '0', '0'], bowlerName: ''},{ }... ...]
 // ]
-
 
 export const batsmenYetToBatOrRetdHurt = (match) => {
     return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === YET_TO_BAT || batsman.status === RETD_HURT);
 }
 
-export const batsmenYetToBatOrRetdHurtOrNotOut = (match) => {
-    return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === YET_TO_BAT || batsman.status === RETD_HURT || batsman.status === NOT_OUT);
-}
-
 export const batsmenNotOut = (match) => {
-    return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT);
+    return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE || batsman.status === NOT_OUT_ON_STRIKE);
 }
 
 export const strikerBatsmanDetails = (match) => {
-    return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT && batsman.striker === true);
+    return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_STRIKE);
 }
 
 export const nonStrikerBatsmanDetails = (match) => {
-    return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT && batsman.striker === false);
+    return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE);
 }
 
 export const nextPossibleBowlers = (match) => {
     return match.innings[match.currentInning].bowlers.filter((bowler) => {
         if (match.innings[match.currentInning].overs.length === 0) {
             return true
-        } else if (bowler.overNumbers.includes(match.innings[match.currentInning].overs.length)) {
+        } else if (match.innings[match.currentInning].overs[match.innings[match.currentInning].overs.length - 1].bowlerName === bowler.name) {
             return false;
-        } else if (bowler.overs !== match.details.maxOversPerBowler) {
+        } else if (bowler.totalOvers !== match.details.maxOversPerBowler) {
             return true;
         }
         return true;
     });
 }
 
-export const currentBowlerName = (inning) => {
-    return inning.overs[inning.overs.length - 1].bowlerName || '';
+export const currentBowlerName = (match) => {
+    return match.innings[match.currentInning].overs[match.innings[match.currentInning].overs.length - 1] ? match.innings[match.currentInning].overs[match.innings[match.currentInning].overs.length - 1].bowlerName : '';
 }
 
-export const wicketsGone = (inning) => {
+export const totalWickets = (inning) => {
     return inning.wickets;
+}
+
+export const totalPlayersInEachTeam = (match) => {
+    return match.details.totalPlayersInEachTeam;
+}
+
+export const getCurrentInning = (match) => {
+    return match.innings[match.currentInning];
 }
 
 const initialState = {
@@ -105,7 +99,6 @@ export const insertMatchDetails = (matchDetails) => {
 }
 
 export const updateInnings = (innings) => {
-    console.log(innings);
     return {
         type: UPDATE_INNINGS,
         payload: innings
