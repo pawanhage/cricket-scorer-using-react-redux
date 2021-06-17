@@ -2,16 +2,22 @@ import { YET_TO_BAT } from "./constants";
 
 export const formInning = (battingTeam, battingTeamPlayers, bowlingTeam, bowlingTeamPlayers) => {
     return {
-        score: 0,
-        wickets: 0,
+        totalScore: 0,
+        totalWickets: 0,
         extras: 0,
+        currentRunRate: 0,
+        requiredRunRate: null,
         battingTeam: battingTeam,
         bowlingTeam: bowlingTeam,
         batsmen: battingTeamPlayers.map((player) => {
             return {
                 name: player,
                 status: YET_TO_BAT,
-                runsScored: [],
+                runsScored: 0,
+                ballsFaced: 0,
+                fours: 0,
+                sixes: 0,
+                strikeRate: 0,
                 wicketDetails: null
             }
         }),

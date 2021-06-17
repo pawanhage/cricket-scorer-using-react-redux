@@ -1,4 +1,4 @@
-import { NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RETD_HURT, YET_TO_BAT } from "../constants";
+import { COMPLETE, IN_PROGRESS, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RETD_HURT, YET_TO_BAT } from "../constants";
 
 export const INSERT_MATCH_DETALS = 'INSERT_MATCH_DETAILS';
 export const UPDATE_INNINGS = 'UPDATE_INNINGS';
@@ -7,60 +7,28 @@ export const END_BALL = 'END_BALL';
 export const END_INNING = 'END_INNING';
 export const RESET_LAST_BALL = 'RESET_LAST_BALL';
 
-// innings: [
-//     {
-//         score: 100,
-//         wickets: 4,
-//         extras: 21,
-//         battingTeam: 
-//         bowlingTeam:
-//         batsmen: [
-//             {
-//                 name:
-//                 status:
-//                 runsScored: [1, 0, 3, 4, 0]
-//                 wicketDetails: {
-//                     type:
-//                     runOutBy ?:
-//                     bowler:
-//                     caughtBy?:
-//                     stumpedBy ?:
-//                 }
-//             }
-//         ],
-//         bowlers: [
-//         {
-//             name:
-//             totalOvers:
-//             wicketsTaken:
-//             runsGiven:
-//             maiden:
-//         }
-//         ],
-//         overs: [{details: ['1', '1WD', '0', '0', '1', '0', '0'], bowlerName: ''},{ }... ...]
-// ]
-
-export const batsmenYetToBatOrRetdHurt = (match) => {
+export const getYetToBatOrRetdHurtBatsmen = (match) => {
     return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === YET_TO_BAT || batsman.status === RETD_HURT);
 }
 
-export const batsmenNotOut = (match) => {
+export const getNotOutBatsmen = (match) => {
     return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE || batsman.status === NOT_OUT_ON_STRIKE);
 }
 
-export const strikerBatsmanDetails = (match) => {
+export const getStrikerBatsmanDetails = (match) => {
     return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_STRIKE);
 }
 
-export const nonStrikerBatsmanDetails = (match) => {
+export const getNonStrikerBatsmanDetails = (match) => {
     return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE);
 }
 
-export const nextPossibleBowlers = (match) => {
+export const getNextPossibleBowlers = (match) => {
+    let overs = match.innings[match.currentInning].overs;
     return match.innings[match.currentInning].bowlers.filter((bowler) => {
-        if (match.innings[match.currentInning].overs.length === 0) {
+        if (overs.length === 0) {
             return true
-        } else if (match.innings[match.currentInning].overs[match.innings[match.currentInning].overs.length - 1].bowlerName === bowler.name) {
+        } else if (overs[overs.length - 1].bowlerName === bowler.name) {
             return false;
         } else if (bowler.totalOvers !== match.details.maxOversPerBowler) {
             return true;
@@ -69,21 +37,38 @@ export const nextPossibleBowlers = (match) => {
     });
 }
 
-export const currentBowlerName = (match) => {
-    return match.innings[match.currentInning].overs[match.innings[match.currentInning].overs.length - 1] ? match.innings[match.currentInning].overs[match.innings[match.currentInning].overs.length - 1].bowlerName : '';
+export const getCurrentBowlerName = (match) => {
+    let overs = match.innings[match.currentInning].overs;
+    let lastOver = overs.length && overs[overs.length - 1];
+    return lastOver && lastOver.status === IN_PROGRESS ? lastOver.bowlerName : null;
 }
 
-export const totalWickets = (inning) => {
-    return inning.wickets;
+export const getCurrentOver = (match) => {
+    let overs = match.innings[match.currentInning].overs;
+    let lastOver = overs.length && overs[overs.length - 1];
+    return lastOver && lastOver.status === IN_PROGRESS ? lastOver : null;
 }
 
-export const totalPlayersInEachTeam = (match) => {
-    return match.details.totalPlayersInEachTeam;
+export const getTotalWickets = (match) => {
+    return match.innings[match.currentInning].totalWickets;
+}
+
+export const getTotalPlayersPerSide = (match) => {
+    return match.details.totalPlayersPerSide;
 }
 
 export const getCurrentInning = (match) => {
     return match.innings[match.currentInning];
 }
+
+export const getLastBall = (match) => {
+    let overs = match.innings[match.currentInning].overs;
+    let lastOver = overs.length > 0 && overs[overs.length - 1];
+    let lastBall = lastOver && lastOver.length > 0 && lastOver.details[lastOver.length - 1];
+    return lastBall ? lastBall : null;
+}
+
+
 
 const initialState = {
     details: null,

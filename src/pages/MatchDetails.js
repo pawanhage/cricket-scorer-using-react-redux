@@ -54,7 +54,7 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
             totalOversInOneInning: totalOversInOneInning,
             tossResult: tossResult,
             maxOversPerBowler: maxOversPerBowler,
-            totalPlayersInEachTeam: firstTeamPlayers.length
+            totalPlayersPerSide: firstTeamPlayers.length
         });
         let innings = [];
         let battingTeam = tossResult === 12 ? firstTeamName : secondTeamName;

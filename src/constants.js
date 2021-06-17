@@ -2,6 +2,7 @@ export const WICKET = 'W';
 export const RUN_OUT = 'R';
 export const CAUGHT_BY = 'C';
 export const LBW = 'LBW';
+export const BOWLED = 'B'
 
 export const WIDE = 'WD';
 export const NO_BALL = 'NB';
@@ -18,3 +19,6 @@ export const DID_NOT_BAT = 'DNB';
 
 export const ONE_DAY_MATCH = 'ODM';
 export const TEST_MATCH = 'TM';
+
+export const IN_PROGRESS = 'IN_PROGRESS';
+export const COMPLETE = 'COMPLETE';
