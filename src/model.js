@@ -4,28 +4,33 @@ export const innings = [
     {
         totalScore: Number,
         totalWickets: Number,
-        currentRunRate: Number,
-        requiredRunRate: Number,
-        extras: Number,
+        extras: {
+            wides: Number,
+            noBalls: Number,
+            legByes: Number,
+            byes: Number,
+            penaltyRuns: Number
+        },
         battingTeam: String,
         bowlingTeam: String,
-        batsmen:
-        {
-            name: String,
-            status: OUT | NOT_OUT_ON_NON_STRIKE | NOT_OUT_ON_STRIKE | RETD_HURT | YET_TO_BAT,
-            runsScored: Number,
-            ballsFaced: Number,
-            fours: Number,
-            sixes: Number,
-            strikeRate: Number,
-            wicketDetails: {
-                type: RUN_OUT | CAUGHT_BY | BOWLED | LBW,
-                runOutBy: String,
-                bowler: String,
-                caughtBy: String,
-                stumpedBy: String
+        batsmen: [
+            {
+                name: String,
+                status: OUT | NOT_OUT_ON_NON_STRIKE | NOT_OUT_ON_STRIKE | RETD_HURT | YET_TO_BAT,
+                runsScored: Number,
+                ballsFaced: Number,
+                fours: Number,
+                sixes: Number,
+                strikeRate: Number,
+                wicketDetails: {
+                    type: RUN_OUT | CAUGHT_BY | BOWLED | LBW,
+                    runOutBy: String,
+                    bowler: String,
+                    caughtBy: String,
+                    stumpedBy: String
+                }
             }
-        },
+        ],
         bowlers: [
             {
                 name: String,
@@ -39,6 +44,7 @@ export const innings = [
             {
                 details: [String],
                 bowlerName: String,
+                totalRunsThisOver: Number,
                 status: IN_PROGRESS | COMPLETE
             }
         ]

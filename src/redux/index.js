@@ -68,8 +68,6 @@ export const getLastBall = (match) => {
     return lastBall ? lastBall : null;
 }
 
-
-
 const initialState = {
     details: null,
     innings: [],
