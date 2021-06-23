@@ -16,8 +16,11 @@ import {
 } from '../redux';
 import { Dropdown } from 'primereact/dropdown';
 import { RadioButton } from 'primereact/radiobutton';
-import { IN_PROGRESS, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, WICKET } from '../constants';
+import { CAUGHT_BY, COMPLETE, IN_PROGRESS, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RUN_OUT, STUMPED, WICKET } from '../constants';
 import { Button } from 'primereact/button';
+import { SelectButton } from 'primereact/selectbutton';
+import { InputNumber } from 'primereact/inputnumber';
+import { getUpdatedBatsmanStatus } from '../utils/cricketUtils';
 
 function UpdateScore({
     totalPlayersPerSide,
@@ -28,7 +31,7 @@ function UpdateScore({
     nextPossibleBowlers,
     currentBowlerName,
     totalWickets,
-    currentInning,
+    currentInningIndex,
     innings,
     lastBall,
     currentOver,
@@ -40,41 +43,94 @@ function UpdateScore({
     const [_nextBowler, setCurrentBowler] = useState(null);
     const [_nextBatsman, setNextBatsman] = useState(null);
 
-    let _batsmenYetToBatOrRetdHurtOptions = batsmenYetToBatOrRetdHurt.map((batsman) => {
+    const [runs, setRuns] = useState(0);
+    const [wicketType, setWicketType] = useState(null);
+    const [runOutBy, setRunOutBy] = useState(null);
+    const [caughtBy, setCaughtBy] = useState(null);
+    const [stumpedBy, setStumpedBy] = useState(null);
+
+    const _batsmenYetToBatOrRetdHurtOptions = batsmenYetToBatOrRetdHurt.map((batsman) => {
         return { name: batsman.name, value: batsman }
     });
 
-    let _batsmenNotOutOptions = batsmenNotOut.map((batsman) => {
+    const _batsmenNotOutOptions = batsmenNotOut.map((batsman) => {
         return { name: batsman.name, value: batsman }
     });
 
-    let _nextPossibleBowlersOptions = nextPossibleBowlers.map((bowler) => {
+    const _nextPossibleBowlersOptions = nextPossibleBowlers.map((bowler) => {
         return { name: bowler.name, value: bowler }
     });
 
-    const _startMatch = () => {
+    const ballOptions = [
+        { label: '0', value: 0 },
+        { label: '1', value: 1 },
+        { label: '2', value: 2 },
+        { label: '3', value: 3 },
+        { label: '4', value: 4 },
+        { label: '5', value: 5 },
+        { label: '6', value: 6 }
+    ];
+
+    const wicketBy = () => {
+        if (wicketType === RUN_OUT) {
+            return (
+                <>
+                    <span className="marg-10" >Run Out By</span>
+                    <Dropdown optionLabel="name" value={runOutBy} options={ } onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
+                </>
+            )
+        } else if (wicketType === CAUGHT_BY) {
+            return (
+                <>
+                    <span className="marg-10" >Caught By</span>
+                    <Dropdown optionLabel="name" value={_batsmanOnStrike} options={_batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
+                </>
+            )
+        } else if (wicketType === STUMPED) {
+            return (
+                <>
+                    <span className="marg-10" >Stumped By</span>
+                    <Dropdown optionLabel="name" value={_batsmanOnStrike} options={_batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
+                </>
+            )
+        }
+    }
+
+    const CurrentBallDetails = () => {
+        if (currentBowlerName && totalWickets !== totalPlayersPerSide && currentOver.status === IN_PROGRESS && !lastBall.includes(WICKET)) {
+            return (
+                <Card subTitle="Next Ball">
+                    <div>
+                        <SelectButton className="displayInline" value={runs} onChange={(e) => setRuns(e.value)} options={ballOptions} />
+                        <InputNumber className="marg-left-10 wdh-1" value={runs} onValueChange={(e) => setRuns(e.value)} mode="decimal" min={0} max={100} />
+                    </div>
+                </Card >
+            )
+        }
+        return <></>;
+    }
+
+    const _continueMatch = () => {
         if (lastBall !== WICKET) {
-            let index = innings[currentInning].batsmen.findIndex((batsman) => batsman.name === _batsmanOnStrike.name);
+            let index = innings[currentInningIndex].batsmen.findIndex((batsman) => batsman.name === _batsmanOnStrike.name);
             if (index > -1) {
-                innings[currentInning].batsmen[index] = {
-                    ...innings[currentInning].batsmen[index],
-                    status: NOT_OUT_ON_STRIKE
+                innings[currentInningIndex].batsmen[index] = {
+                    ...getUpdatedBatsmanStatus(innings[currentInningIndex].batsmen[index], NOT_OUT_ON_STRIKE)
                 }
             }
 
-            index = innings[currentInning].batsmen.findIndex((batsman) => batsman.name === _batsmanOnNonStrike.name);
+            index = innings[currentInningIndex].batsmen.findIndex((batsman) => batsman.name === _batsmanOnNonStrike.name);
             if (index > -1) {
-                innings[currentInning].batsmen[index] = {
-                    ...innings[currentInning].batsmen[index],
-                    status: NOT_OUT_ON_NON_STRIKE
+                innings[currentInningIndex].batsmen[index] = {
+                    ...getUpdatedBatsmanStatus(innings[currentInningIndex].batsmen[index], NOT_OUT_ON_NON_STRIKE)
                 }
             }
         }
 
         if (!currentOver) {
-            let index = innings[currentInning].bowlers.findIndex((bowler) => bowler.name === _nextBowler.name);
+            let index = innings[currentInningIndex].bowlers.findIndex((bowler) => bowler.name === _nextBowler.name);
             if (index > -1) {
-                innings[currentInning].overs.push({
+                innings[currentInningIndex].overs.push({
                     details: [],
                     bowlerName: _nextBowler.name,
                     status: IN_PROGRESS
@@ -90,11 +146,9 @@ function UpdateScore({
             return (
                 <Card subTitle="Choose Batsman">
                     {/* Choose New Batsmen */}
-                    <div>
+                    <div className="marg-10">
                         <span className="marg-10" >On Strike End</span>
                         <Dropdown optionLabel="name" value={_batsmanOnStrike} options={_batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
-                    </div>
-                    <div>
                         <span className="marg-10" >On Non Strike End</span>
                         <Dropdown optionLabel="name" value={_batsmanOnNonStrike} options={_batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnNonStrike(e.value)} placeholder="Select" />
                     </div>
@@ -128,7 +182,7 @@ function UpdateScore({
     }
 
     const ChooseCurrentBowler = () => {
-        if (!currentBowlerName) {
+        if (!currentBowlerName || currentOver.status === COMPLETE) {
             return (
                 <Card subTitle="Choose Bowler">
                     {/* Choose Bowler after over */}
@@ -142,7 +196,7 @@ function UpdateScore({
     return (
         <div>
             <div className="p-grid nested-grid">
-                <div className="p-col-8">
+                <div className="p-col-6">
                     <div className="p-grid">
                         <div className="p-col-12">
                             12
@@ -152,12 +206,19 @@ function UpdateScore({
                         </div>
                     </div>
                 </div>
-                <div className="p-col-4">
+                <div className="p-col-6">
                     <Card title="Update Score" subTitle="Ball by Ball Scoring">
-                        {<ChooseBatsman></ChooseBatsman>}
-                        {<ChooseCurrentBowler></ChooseCurrentBowler>}
+                        <div className="marg-left-rigth-bottom-10" >
+                            {<ChooseBatsman></ChooseBatsman>}
+                        </div>
+                        <div className="marg-10" >
+                            {<ChooseCurrentBowler></ChooseCurrentBowler>}
+                        </div>
+                        <div className="marg-10" >
+                            <CurrentBallDetails></CurrentBallDetails>
+                        </div>
                         <div className="p-fluid">
-                            <Button type="button" label="Start Match" className="p-mt-5" onClick={() => _startMatch()} />
+                            <Button type="button" disabled={!_batsmanOnStrike || !_batsmanOnNonStrike || !_nextBowler} label="Continue" className="p-mt-5" onClick={() => _continueMatch()} />
                         </div>
                     </Card>
                 </div>
@@ -170,7 +231,7 @@ const mapStateToProps = (state) => {
     return {
         totalPlayersPerSide: getTotalPlayersPerSide(state.match),
         innings: state.match.innings,
-        currentInning: state.match.currentInning,
+        currentInningIndex: state.match.currentInningIndex,
         batsmenYetToBatOrRetdHurt: getYetToBatOrRetdHurtBatsmen(state.match),
         batsmenNotOut: getNotOutBatsmen(state.match),
         strikerBatsmanDetails: getStrikerBatsmanDetails(state.match),

@@ -8,24 +8,24 @@ export const END_INNING = 'END_INNING';
 export const RESET_LAST_BALL = 'RESET_LAST_BALL';
 
 export const getYetToBatOrRetdHurtBatsmen = (match) => {
-    return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === YET_TO_BAT || batsman.status === RETD_HURT);
+    return match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === YET_TO_BAT || batsman.status === RETD_HURT);
 }
 
 export const getNotOutBatsmen = (match) => {
-    return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE || batsman.status === NOT_OUT_ON_STRIKE);
+    return match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE || batsman.status === NOT_OUT_ON_STRIKE);
 }
 
 export const getStrikerBatsmanDetails = (match) => {
-    return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_STRIKE);
+    return match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_STRIKE);
 }
 
 export const getNonStrikerBatsmanDetails = (match) => {
-    return match.innings[match.currentInning].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE);
+    return match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE);
 }
 
 export const getNextPossibleBowlers = (match) => {
-    let overs = match.innings[match.currentInning].overs;
-    return match.innings[match.currentInning].bowlers.filter((bowler) => {
+    let overs = match.innings[match.currentInningIndex].overs;
+    return match.innings[match.currentInningIndex].bowlers.filter((bowler) => {
         if (overs.length === 0) {
             return true
         } else if (overs[overs.length - 1].bowlerName === bowler.name) {
@@ -38,40 +38,40 @@ export const getNextPossibleBowlers = (match) => {
 }
 
 export const getCurrentBowlerName = (match) => {
-    let overs = match.innings[match.currentInning].overs;
+    let overs = match.innings[match.currentInningIndex].overs;
     let lastOver = overs.length && overs[overs.length - 1];
     return lastOver && lastOver.status === IN_PROGRESS ? lastOver.bowlerName : null;
 }
 
 export const getCurrentOver = (match) => {
-    let overs = match.innings[match.currentInning].overs;
+    let overs = match.innings[match.currentInningIndex].overs;
     let lastOver = overs.length && overs[overs.length - 1];
-    return lastOver && lastOver.status === IN_PROGRESS ? lastOver : null;
+    return lastOver ? lastOver : null;
 }
 
 export const getTotalWickets = (match) => {
-    return match.innings[match.currentInning].totalWickets;
+    return match.innings[match.currentInningIndex].totalWickets;
 }
 
 export const getTotalPlayersPerSide = (match) => {
     return match.details.totalPlayersPerSide;
 }
 
-export const getCurrentInning = (match) => {
-    return match.innings[match.currentInning];
+export const getcurrentInningIndex = (match) => {
+    return match.innings[match.currentInningIndex];
 }
 
 export const getLastBall = (match) => {
-    let overs = match.innings[match.currentInning].overs;
+    let overs = match.innings[match.currentInningIndex].overs;
     let lastOver = overs.length > 0 && overs[overs.length - 1];
     let lastBall = lastOver && lastOver.length > 0 && lastOver.details[lastOver.length - 1];
-    return lastBall ? lastBall : null;
+    return lastBall ? lastBall : '';
 }
 
 const initialState = {
     details: null,
     innings: [],
-    currentInning: 0,
+    currentInningIndex: 0,
 }
 
 export const insertMatchDetails = (matchDetails) => {

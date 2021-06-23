@@ -7,7 +7,7 @@ import { insertMatchDetails, updateInnings } from '../redux';
 import { connect } from 'react-redux';
 import { useHistory } from "react-router-dom";
 import { ONE_DAY_MATCH, TEST_MATCH } from '../constants';
-import { formInning } from '../utils';
+import { formInning } from '../utils/cricketUtils';
 
 function MatchDetails({ insertMatchDetails, updateInnings }) {
 

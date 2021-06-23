@@ -77,3 +77,19 @@
 .marg-right-10 {
     margin-right: 10px;
 }
+
+.marg-left-rigth-bottom-10 {
+    margin: 0px 10px 10px 10px;
+}
+
+.marg-left-10 {
+    margin-left: 10px;
+}
+
+.displayInline {
+    display: inline ;
+}
+
+.p-inputtext {
+    width: 4em;
+}

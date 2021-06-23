@@ -290,35 +290,35 @@ export const getRequiredRunRate = (totalScore, target, currentOvers, oversPerSid
     return Number((((target - totalScore) / totalBallsRemained) * 6).toFixed(2));
 }
 
-export const getUpdatedInningStats = (currentInning, currentBall) => {
+export const getUpdatedInningStats = (currentInningIndex, currentBall) => {
     const ball = currentBall.split('');
     if (isWicketBall(currentBall)) {
-        currentInning = {
-            ...currentInning,
-            totalWickets: currentInning.totalWickets + 1
+        currentInningIndex = {
+            ...currentInningIndex,
+            totalWickets: currentInningIndex.totalWickets + 1
         }
     }
 
     const index = getExtraBallIndex(ball);
     if (index > -1) {
         let ext = getExtrasFromCurrentBall(currentBall);
-        currentInning = {
-            ...currentInning,
+        currentInningIndex = {
+            ...currentInningIndex,
             extras: {
-                ...currentInning.extras,
-                wides: currentInning.extras.wides + ext.wides,
-                noBalls: currentInning.extras.noBalls + ext.noBalls,
-                legByes: currentInning.extras.legByes + ext.legByes,
-                byes: currentInning.extras.byes + ext.byes,
-                penaltyRuns: currentInning.extras.penaltyRuns + ext.penaltyRuns
+                ...currentInningIndex.extras,
+                wides: currentInningIndex.extras.wides + ext.wides,
+                noBalls: currentInningIndex.extras.noBalls + ext.noBalls,
+                legByes: currentInningIndex.extras.legByes + ext.legByes,
+                byes: currentInningIndex.extras.byes + ext.byes,
+                penaltyRuns: currentInningIndex.extras.penaltyRuns + ext.penaltyRuns
             }
         }
     }
 
-    currentInning = {
-        ...currentInning,
-        totalScore: currentInning.totalScore + getRunsFromCurrentBall(currentBall)
+    currentInningIndex = {
+        ...currentInningIndex,
+        totalScore: currentInningIndex.totalScore + getRunsFromCurrentBall(currentBall)
     }
 
-    return currentInning;
+    return currentInningIndex;
 }

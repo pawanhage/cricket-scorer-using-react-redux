@@ -22,6 +22,7 @@ export const innings = [
                 fours: Number,
                 sixes: Number,
                 strikeRate: Number,
+                order: Number,
                 wicketDetails: {
                     type: RUN_OUT | CAUGHT_BY | BOWLED | LBW,
                     runOutBy: String,
