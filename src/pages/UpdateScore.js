@@ -12,11 +12,25 @@ import {
     getTotalWickets,
     updateInnings,
     getLastBall,
-    getCurrentOver
+    getCurrentOver,
+    getBowlingTeamPlayers
 } from '../redux';
 import { Dropdown } from 'primereact/dropdown';
 import { RadioButton } from 'primereact/radiobutton';
-import { CAUGHT_BY, COMPLETE, IN_PROGRESS, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RUN_OUT, STUMPED, WICKET } from '../constants';
+import {
+    CAUGHT_BY,
+    COMPLETE,
+    extrasOptions,
+    FIELD_OBSTRUCT,
+    IN_PROGRESS,
+    NOT_OUT_ON_NON_STRIKE,
+    NOT_OUT_ON_STRIKE,
+    runsOptions,
+    RUN_OUT,
+    STUMPED,
+    WICKET,
+    wicketOptions
+} from '../constants';
 import { Button } from 'primereact/button';
 import { SelectButton } from 'primereact/selectbutton';
 import { InputNumber } from 'primereact/inputnumber';
@@ -35,6 +49,7 @@ function UpdateScore({
     innings,
     lastBall,
     currentOver,
+    bowlingTeamPlayers,
     updateInnings
 }) {
 
@@ -44,10 +59,13 @@ function UpdateScore({
     const [_nextBatsman, setNextBatsman] = useState(null);
 
     const [runs, setRuns] = useState(0);
+    const [extra, setExtra] = useState(null);
+
     const [wicketType, setWicketType] = useState(null);
     const [runOutBy, setRunOutBy] = useState(null);
     const [caughtBy, setCaughtBy] = useState(null);
     const [stumpedBy, setStumpedBy] = useState(null);
+    const [outPlayer, setOutPlayer] = useState(null);
 
     const _batsmenYetToBatOrRetdHurtOptions = batsmenYetToBatOrRetdHurt.map((batsman) => {
         return { name: batsman.name, value: batsman }
@@ -61,48 +79,142 @@ function UpdateScore({
         return { name: bowler.name, value: bowler }
     });
 
-    const ballOptions = [
-        { label: '0', value: 0 },
-        { label: '1', value: 1 },
-        { label: '2', value: 2 },
-        { label: '3', value: 3 },
-        { label: '4', value: 4 },
-        { label: '5', value: 5 },
-        { label: '6', value: 6 }
-    ];
+    const _bowlingTeamPlayersOptions = bowlingTeamPlayers.map((player) => {
+        return { name: player, value: player }
+    });
 
-    const wicketBy = () => {
-        if (wicketType === RUN_OUT) {
-            return (
-                <>
-                    <span className="marg-10" >Run Out By</span>
-                    <Dropdown optionLabel="name" value={runOutBy} options={ } onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
-                </>
-            )
-        } else if (wicketType === CAUGHT_BY) {
-            return (
-                <>
-                    <span className="marg-10" >Caught By</span>
-                    <Dropdown optionLabel="name" value={_batsmanOnStrike} options={_batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
-                </>
-            )
-        } else if (wicketType === STUMPED) {
-            return (
-                <>
-                    <span className="marg-10" >Stumped By</span>
-                    <Dropdown optionLabel="name" value={_batsmanOnStrike} options={_batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
-                </>
-            )
-        }
+    const _currentBatsmanOptions = [_batsmanOnStrike, _batsmanOnNonStrike].map((player) => {
+        return { name: player.name, value: player }
+    });
+
+    const WicketDetails = () => {
+        return (
+            <>
+                {(() => {
+                    if (wicketType === RUN_OUT) {
+                        return (
+                            <>
+                                <div className="textGroup displayInlineTable">
+                                    <div className="label">Who Out</div>
+                                    <div className="field">
+                                        <Dropdown optionLabel="name" value={stumpedBy} options={_currentBatsmanOptions} onChange={(e) => setOutPlayer(e.value)} placeholder="Select" />
+                                    </div>
+                                </div>
+                                <div className="textGroup displayInlineTable">
+                                    <div className="label">Run Out By</div>
+                                    <div className="field">
+                                        <Dropdown optionLabel="name" value={runOutBy} options={_bowlingTeamPlayersOptions} onChange={(e) => setRunOutBy(e.value)} placeholder="Select" />
+                                    </div>
+                                </div>
+                            </>
+                        )
+                    } else if (wicketType === CAUGHT_BY) {
+                        return (
+                            <>
+                                <div className="textGroup">
+                                    <div className="label">Caught By</div>
+                                    <div className="field">
+                                        <Dropdown optionLabel="name" value={caughtBy} options={_bowlingTeamPlayersOptions} onChange={(e) => setCaughtBy(e.value)} placeholder="Select" />
+                                    </div>
+                                </div>
+                            </>
+                        )
+                    } else if (wicketType === STUMPED) {
+                        return (
+                            <>
+                                <div className="textGroup">
+                                    <div className="label">Stumped By</div>
+                                    <div className="field">
+                                        <Dropdown optionLabel="name" value={stumpedBy} options={_bowlingTeamPlayersOptions.filter((e) => e.name !== currentBowlerName)} onChange={(e) => setStumpedBy(e.value)} placeholder="Select" />
+                                    </div>
+                                </div>
+                            </>
+                        )
+                    } else if (wicketType === FIELD_OBSTRUCT) {
+                        return (
+                            <>
+                                <div className="textGroup">
+                                    <div className="label">Who Out</div>
+                                    <div className="field">
+                                        <Dropdown optionLabel="name" value={outPlayer} options={_currentBatsmanOptions} onChange={(e) => setOutPlayer(e.value)} placeholder="Select" />
+                                    </div>
+                                </div>
+                            </>
+                        )
+                    }
+                    return <></>;
+                })()}
+            </>
+        );
     }
 
     const CurrentBallDetails = () => {
         if (currentBowlerName && totalWickets !== totalPlayersPerSide && currentOver.status === IN_PROGRESS && !lastBall.includes(WICKET)) {
             return (
                 <Card subTitle="Next Ball">
-                    <div>
-                        <SelectButton className="displayInline" value={runs} onChange={(e) => setRuns(e.value)} options={ballOptions} />
-                        <InputNumber className="marg-left-10 wdh-1" value={runs} onValueChange={(e) => setRuns(e.value)} mode="decimal" min={0} max={100} />
+                    <div className="textGroups textGroups--table">
+                        <div className="textGroup">
+                            <div className="label">Runs</div>
+                            <div className="field">
+                                <SelectButton className="display-inline-flex" value={runs} onChange={(e) => setRuns(e.value)} options={runsOptions} />
+                                <InputNumber className="marg-left-10 wdh-1" value={runs} onValueChange={(e) => setRuns(e.value)} mode="decimal" min={0} max={100} />
+                            </div>
+                        </div>
+                        <div className="textGroup">
+                            <div className="label">Extras</div>
+                            <div className="field">
+                                <SelectButton className="display-inline-flex" value={extra} onChange={(e) => setExtra(e.value)} options={extrasOptions} />
+                            </div>
+                        </div>
+                        <div className="textGroup">
+                            <div className="label">Wicket</div>
+                            <div className="field">
+                                <SelectButton className="display-inline-flex" value={wicketType} onChange={(e) => setWicketType(e.value)} options={wicketOptions} />
+                            </div>
+                        </div>
+                        <WicketDetails></WicketDetails>
+                        <div>
+                            <div className="textGroup displayInlineTable">
+                                <div className="field">
+                                    <Button label="Primary" className="p-button-outlined" />
+                                </div>
+                            </div>
+                            <div className="textGroup displayInlineTable">
+                                <div className="field">
+                                    <Button label="Warning" className="p-button-outlined p-button-warning" />
+                                </div>
+                            </div>
+                            <div className="textGroup displayInlineTable">
+                                <div className="field">
+                                    <Button label="Primary" className="p-button-outlined" />
+                                </div>
+                            </div>
+                            <div className="textGroup displayInlineTable">
+                                <div className="field">
+                                    <Button label="Info" className="p-button-outlined p-button-info" />
+                                </div>
+                            </div>
+                            <div className="textGroup displayInlineTable">
+                                <div className="field">
+                                    <Button label="Success" className="p-button-outlined p-button-success" />
+                                </div>
+                            </div>
+                            <div className="textGroup displayInlineTable">
+                                <div className="field">
+                                    <Button label="Secondary" className="p-button-outlined p-button-secondary" />
+                                </div>
+                            </div>
+                            <div className="textGroup displayInlineTable">
+                                <div className="field displayInlineTable">
+                                    <Button label="Danger" className="p-button-outlined p-button-danger" />
+                                </div>
+                            </div>
+                            <div className="textGroup displayInlineTable">
+                                <div className="field">
+                                    <Button label="Help" className="p-button-outlined p-button-help" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </Card >
             )
@@ -240,7 +352,8 @@ const mapStateToProps = (state) => {
         currentBowlerName: getCurrentBowlerName(state.match),
         totalWickets: getTotalWickets(state.match),
         lastBall: getLastBall(state.match),
-        currentOver: getCurrentOver(state.match)
+        currentOver: getCurrentOver(state.match),
+        bowlingTeamPlayers: getBowlingTeamPlayers(state.match)
     }
 }
 

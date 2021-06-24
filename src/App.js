@@ -1,4 +1,4 @@
-import './App.css';
+import './App.scss';
 import FullScorecard from './pages/FullScorecard';
 import MatchDetails from './pages/MatchDetails';
 import UpdateScore from './pages/UpdateScore';

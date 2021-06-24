@@ -40,16 +40,7 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
 
     const setMatchDetails = () => {
         insertMatchDetails({
-            teams: [
-                {
-                    name: firstTeamName,
-                    players: firstTeamPlayers
-                },
-                {
-                    name: secondTeamName,
-                    players: secondTeamPlayers
-                }
-            ],
+            teams: {[firstTeamName]:firstTeamPlayers, [secondTeamName]:secondTeamPlayers},
             matchType: matchType,
             totalOversInOneInning: totalOversInOneInning,
             tossResult: tossResult,

@@ -1,4 +1,4 @@
-import { COMPLETE, IN_PROGRESS, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RETD_HURT, YET_TO_BAT } from "../constants";
+import { IN_PROGRESS, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RETD_HURT, YET_TO_BAT } from "../constants";
 
 export const INSERT_MATCH_DETALS = 'INSERT_MATCH_DETAILS';
 export const UPDATE_INNINGS = 'UPDATE_INNINGS';
@@ -66,6 +66,14 @@ export const getLastBall = (match) => {
     let lastOver = overs.length > 0 && overs[overs.length - 1];
     let lastBall = lastOver && lastOver.length > 0 && lastOver.details[lastOver.length - 1];
     return lastBall ? lastBall : '';
+}
+
+export const getBattingTeamPlayers = (match) => {
+    return match.details.teams[match.innings[match.currentInningIndex].battingTeam];
+}
+
+export const getBowlingTeamPlayers = (match) => {
+    return match.details.teams[match.innings[match.currentInningIndex].bowlingTeam];
 }
 
 const initialState = {
