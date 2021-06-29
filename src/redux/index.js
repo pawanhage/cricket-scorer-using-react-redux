@@ -15,12 +15,14 @@ export const getNotOutBatsmen = (match) => {
     return match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE || batsman.status === NOT_OUT_ON_STRIKE);
 }
 
-export const getStrikerBatsmanDetails = (match) => {
-    return match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_STRIKE);
+export const getstrikerBatsman = (match) => {
+    const batsman = match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_STRIKE)[0];
+    return batsman ? batsman.name : '';
 }
 
-export const getNonStrikerBatsmanDetails = (match) => {
-    return match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE);
+export const getNonStrikerBatsman = (match) => {
+    const batsman = match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE)[0];
+    return batsman ? batsman.name : '';
 }
 
 export const getNextPossibleBowlers = (match) => {
@@ -37,7 +39,7 @@ export const getNextPossibleBowlers = (match) => {
     });
 }
 
-export const getCurrentBowlerName = (match) => {
+export const getCurrentBowler = (match) => {
     let overs = match.innings[match.currentInningIndex].overs;
     let lastOver = overs.length && overs[overs.length - 1];
     return lastOver && lastOver.status === IN_PROGRESS ? lastOver.bowlerName : null;

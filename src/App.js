@@ -8,7 +8,7 @@ function App() {
     return (
         <div>
             <div>
-                <h1 className="text-align-center">Cricket Scorer</h1>
+                <h1 className="text-align-center marg0">Cricket Scorer</h1>
             </div>
             <div className='App'>
                 <Router>

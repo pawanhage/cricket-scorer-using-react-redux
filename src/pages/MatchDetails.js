@@ -36,11 +36,11 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
         { name: secondTeamName + ' won the toss and elected to bowl first', value: 12 }
     ];
 
-    let maxOversPerBowlerOptions = Array.from(Array(10).keys()).map((i) => { return { name: i + 1, value: i + 1 } });
+    let maxOversPerBowlerOptions = Array.from(Array(Math.ceil(Number(totalOversInOneInning / 2))).keys()).map((i) => { return { name: i + 1, value: i + 1 } });
 
     const setMatchDetails = () => {
         insertMatchDetails({
-            teams: {[firstTeamName]:firstTeamPlayers, [secondTeamName]:secondTeamPlayers},
+            teams: { [firstTeamName]: firstTeamPlayers, [secondTeamName]: secondTeamPlayers },
             matchType: matchType,
             totalOversInOneInning: totalOversInOneInning,
             tossResult: tossResult,

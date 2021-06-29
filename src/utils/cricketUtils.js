@@ -322,3 +322,31 @@ export const getUpdatedInningStats = (currentInningIndex, currentBall) => {
 
     return currentInningIndex;
 }
+
+export const isContinueButtonDisabledForCurrentBall = (runs, extra, wicketType, whoOut, runOutBy, caughtBy, stumpedBy) => {
+    let disabled = runs === null && !isNaN(runs) && !extra;
+    if (wicketType) {
+        if (wicketType === RUN_OUT) {
+            if (!whoOut || !runOutBy) {
+                disabled = true;
+            } else {
+                disabled = false;
+            }
+        } else if (wicketType === CAUGHT_BY) {
+            if (!caughtBy) {
+                disabled = true;
+            } else {
+                disabled = false;
+            }
+        } else if (wicketType === STUMPED) {
+            if (!stumpedBy) {
+                disabled = true
+            } else {
+                disabled = false;
+            }
+        } else {
+            disabled = false;
+        }
+    }
+    return disabled;
+}
