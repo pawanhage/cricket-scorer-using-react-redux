@@ -1,4 +1,5 @@
 import { IN_PROGRESS, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RETD_HURT, YET_TO_BAT } from "../constants";
+import { calculateCurrentRunRate, getTotalOvers } from "../utils/cricketUtils";
 
 export const INSERT_MATCH_DETALS = 'INSERT_MATCH_DETAILS';
 export const UPDATE_INNINGS = 'UPDATE_INNINGS';
@@ -15,14 +16,14 @@ export const getNotOutBatsmen = (match) => {
     return match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE || batsman.status === NOT_OUT_ON_STRIKE);
 }
 
-export const getstrikerBatsman = (match) => {
+export const getStrikerBatsman = (match) => {
     const batsman = match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_STRIKE)[0];
-    return batsman ? batsman.name : '';
+    return batsman ? batsman : null;
 }
 
 export const getNonStrikerBatsman = (match) => {
     const batsman = match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === NOT_OUT_ON_NON_STRIKE)[0];
-    return batsman ? batsman.name : '';
+    return batsman ? batsman : null;
 }
 
 export const getNextPossibleBowlers = (match) => {
@@ -42,7 +43,11 @@ export const getNextPossibleBowlers = (match) => {
 export const getCurrentBowler = (match) => {
     let overs = match.innings[match.currentInningIndex].overs;
     let lastOver = overs.length && overs[overs.length - 1];
-    return lastOver && lastOver.status === IN_PROGRESS ? lastOver.bowlerName : null;
+    const bowlerName = lastOver && lastOver.status === IN_PROGRESS ? lastOver.bowlerName : null;
+    if (bowlerName) {
+        return match.innings[match.currentInningIndex].bowlers.filter((bowler) => bowler.name === bowlerName)[0];
+    }
+    return null;
 }
 
 export const getCurrentOver = (match) => {
@@ -59,7 +64,7 @@ export const getTotalPlayersPerSide = (match) => {
     return match.details.totalPlayersPerSide;
 }
 
-export const getcurrentInningIndex = (match) => {
+export const getCurrentInning = (match) => {
     return match.innings[match.currentInningIndex];
 }
 
@@ -76,6 +81,14 @@ export const getBattingTeamPlayers = (match) => {
 
 export const getBowlingTeamPlayers = (match) => {
     return match.details.teams[match.innings[match.currentInningIndex].bowlingTeam];
+}
+
+export const getTotalOversCount = (match) => {
+    return getTotalOvers(match.innings[match.currentInningIndex].overs)
+}
+
+export const getCurrentRunRate = (match) => {
+    return calculateCurrentRunRate(match.innings[match.currentInningIndex].totalScore, match.innings[match.currentInningIndex].overs);
 }
 
 const initialState = {

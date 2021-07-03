@@ -9,6 +9,8 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Provider } from 'react-redux';
 import { store } from './configureStore';
+import './css/asianet_theme.css';
+import './css/index.css';
 
 ReactDOM.render(
     <Provider store={store}>

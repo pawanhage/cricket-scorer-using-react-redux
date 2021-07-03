@@ -201,7 +201,10 @@ export const getTotalRunsFromOver = (over) => {
 }
 
 export const countLegalDeliveriesInOver = (over) => {
-    return over.reduce((totalLegalDeliveries, currentBall) => totalLegalDeliveries = totalLegalDeliveries + Number(isLegalDelivery(currentBall)));
+    if (over.length) {
+        return over.reduce((totalLegalDeliveries, currentBall) => totalLegalDeliveries = totalLegalDeliveries + Number(isLegalDelivery(currentBall)));
+    }
+    return 0;
 }
 
 export const getInningsCurrentOverStats = (currentOver, currentBall) => {
@@ -267,8 +270,9 @@ export const getExtrasFromCurrentBall = (currentBall) => {
     return extras;
 }
 
+// Count Total Overs in inning so far, returns "overs.balls"
 export const getTotalOvers = (overs) => {
-    const completedOversCount = overs.filter((over) => over.status === COMPLETE);
+    const completedOversCount = overs.filter((over) => over.status === COMPLETE).length;
     const inProgressOverCount = overs.length - completedOversCount;
     let totalOvers = completedOversCount;
     if (inProgressOverCount > 0) {
@@ -277,13 +281,18 @@ export const getTotalOvers = (overs) => {
     return totalOvers;
 }
 
-export const getCurrentRunRate = (totalScore, currentOvers) => {
+export const calculateCurrentRunRate = (totalScore, currentOvers) => {
     const totalOvers = getTotalOvers(currentOvers);
-    const [overs, balls] = String(totalOvers).split('.')
-    return Number((totalScore / (((Number(overs) * 6 + (Number(balls) ? Number(balls) : 0)) / 6))).toFixed(2));
+    const [overs] = String(totalOvers).split('.');
+    const balls = String(totalOvers).split('.')[1] ? String(totalOvers).split('.')[1] : 0;
+    const totalBalls = (Number(overs) * 6 + balls);
+    if (totalBalls === 0) {
+        return 0
+    }
+    return Number((totalScore / ((totalBalls / 6))).toFixed(2));
 }
 
-export const getRequiredRunRate = (totalScore, target, currentOvers, oversPerSide) => {
+export const calculateRequiredRunRate = (totalScore, target, currentOvers, oversPerSide) => {
     const totalOvers = getTotalOvers(currentOvers);
     const [overs, balls] = String(totalOvers).split('.');
     const totalBallsRemained = oversPerSide * 6 - (Number(overs) * 6 + (Number(balls) ? Number(balls) : 0));
@@ -323,23 +332,23 @@ export const getUpdatedInningStats = (currentInningIndex, currentBall) => {
     return currentInningIndex;
 }
 
-export const isContinueButtonDisabledForCurrentBall = (runs, extra, wicketType, whoOut, runOutBy, caughtBy, stumpedBy) => {
+export const isContinueButtonDisabledForCurrentBall = (runs, extra, wicketType, whoOut, outByPlayer) => {
     let disabled = runs === null && !isNaN(runs) && !extra;
     if (wicketType) {
         if (wicketType === RUN_OUT) {
-            if (!whoOut || !runOutBy) {
+            if (!whoOut || !outByPlayer) {
                 disabled = true;
             } else {
                 disabled = false;
             }
         } else if (wicketType === CAUGHT_BY) {
-            if (!caughtBy) {
+            if (!outByPlayer) {
                 disabled = true;
             } else {
                 disabled = false;
             }
         } else if (wicketType === STUMPED) {
-            if (!stumpedBy) {
+            if (!outByPlayer) {
                 disabled = true
             } else {
                 disabled = false;
