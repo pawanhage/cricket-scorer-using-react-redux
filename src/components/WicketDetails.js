@@ -9,7 +9,7 @@ function SetWhoOut() {
         <>
             <div className="marg-top-right-bottom-10">Who Out</div>
             <div>
-                <Dropdown style={{ width: "100%" }} optionLabel="name" value={wicketDetails._whoOut} options={currentBatsmanOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_WHO_OUT', payload: e.value })} placeholder="Select" />
+                <Dropdown style={{ width: "100%" }} optionLabel="name" value={wicketDetails.whoOut} options={currentBatsmanOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_WHO_OUT', payload: e.value })} placeholder="Select" />
             </div>
         </>
     )
@@ -21,7 +21,7 @@ function SetOutByPlayer({ outByHeading }) {
         <>
             <div className="marg-top-right-bottom-10">{outByHeading}</div>
             <div>
-                <Dropdown style={{ width: "100%" }} optionLabel="name" value={wicketDetails._outByPlayer} options={bowlingTeamPlayersOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_OUT_BY_PLAYER', payload: e.value })} placeholder="Select" />
+                <Dropdown style={{ width: "100%" }} optionLabel="name" value={wicketDetails.outByPlayer} options={bowlingTeamPlayersOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_OUT_BY_PLAYER', payload: e.value })} placeholder="Select" />
             </div>
         </>
     )
@@ -32,21 +32,21 @@ function WicketDetails() {
     return (
         <>
             {(() => {
-                if (wicketDetails._wicketType === RUN_OUT) {
+                if (wicketDetails.wicketType === RUN_OUT) {
                     return (
                         <>
                             <SetWhoOut></SetWhoOut>
                             <SetOutByPlayer outByHeading={'Run Out By'}></SetOutByPlayer>
                         </>
                     )
-                } else if (wicketDetails._wicketType === CAUGHT_BY || wicketDetails._wicketType === STUMPED) {
-                    const outByHeading = wicketDetails._wicketType === CAUGHT_BY ? 'Caught By' : 'Stumped By';
+                } else if (wicketDetails.wicketType === CAUGHT_BY || wicketDetails.wicketType === STUMPED) {
+                    const outByHeading = wicketDetails.wicketType === CAUGHT_BY ? 'Caught By' : 'Stumped By';
                     return (
                         <>
                             <SetOutByPlayer outByHeading={outByHeading}></SetOutByPlayer>
                         </>
                     )
-                } else if (wicketDetails._wicketType === FIELD_OBSTRUCT) {
+                } else if (wicketDetails.wicketType === FIELD_OBSTRUCT) {
                     return (
                         <>
                             <SetWhoOut></SetWhoOut>

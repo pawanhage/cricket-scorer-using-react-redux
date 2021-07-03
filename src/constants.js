@@ -27,7 +27,7 @@ export const TEST_MATCH = 'TM';
 export const IN_PROGRESS = 'IN_PROGRESS';
 export const COMPLETE = 'COMPLETE';
 
-export const runsOptions = [
+export const RUNS_OPTIONS = [
     { label: '0', value: 0, disabled: false },
     { label: '1', value: 1, disabled: false },
     { label: '2', value: 2, disabled: false },
@@ -37,7 +37,7 @@ export const runsOptions = [
     { label: '6', value: 6, disabled: false }
 ];
 
-export const extrasOptions = [
+export const EXTRAS_OPTIONS = [
     { label: 'Wide', value: WIDE, disabled: false },
     { label: 'No Ball', value: NO_BALL, disabled: false },
     { label: 'No Ball (Hit by batsman)', value: NO_BALL_OFF_BAT, disabled: false },
@@ -46,7 +46,7 @@ export const extrasOptions = [
     { label: 'Penalty', value: PENALTY_RUNS, disabled: false }
 ];
 
-export const wicketOptions = [
+export const WICKET_OPTIONS = [
     { label: "Bowled", value: BOWLED, disabled: false },
     { label: "LBW", value: LBW, disabled: false },
     { label: "Catch Out", value: CAUGHT_BY, disabled: false },

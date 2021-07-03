@@ -70,6 +70,7 @@ function CurrentScore({
                                         return <li className={clsName}>ball</li>
                                     });
                                 }
+                                return <>-</>
                             })()
                         }
                     </ul>
