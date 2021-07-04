@@ -14,7 +14,7 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
     const [firstTeamName, setFirstTeamName] = useState('MI');
     const [secondTeamName, setSecondTeamName] = useState('CSK');
     const [matchType, setMatchType] = useState(ONE_DAY_MATCH);
-    const [totalOversInOneInning, setTotalOvers] = useState(5);
+    const [totalOversPerInning, setTotalOvers] = useState(5);
     const [firstTeamPlayers, setFirstTeamPlayers] = useState(['Rohit', 'Pandya', 'Pollard', 'SKY', 'Boult']);
     const [secondTeamPlayers, setSecondTeamPlayers] = useState(['MSD', 'Faf', 'Jadeja', 'Raina', 'Sam']);
     const [tossResult, setTossResult] = useState(12);
@@ -24,7 +24,7 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
 
     let matchTypes = [
         { name: 'One Day Match', value: ONE_DAY_MATCH },
-        { name: 'Test Match (Not Supported)', value: TEST_MATCH }
+        { name: 'Test Match (Not Supported)', value: TEST_MATCH, disabled: true }
     ];
 
     let oversOptions = Array.from(Array(50).keys()).map((i) => { return { name: i + 1, value: i + 1 } });
@@ -36,13 +36,13 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
         { name: secondTeamName + ' won the toss and elected to bowl first', value: 12 }
     ];
 
-    let maxOversPerBowlerOptions = Array.from(Array(Math.ceil(Number(totalOversInOneInning / 2))).keys()).map((i) => { return { name: i + 1, value: i + 1 } });
+    let maxOversPerBowlerOptions = Array.from(Array(Math.ceil(Number(totalOversPerInning / 2))).keys()).map((i) => { return { name: i + 1, value: i + 1 } });
 
     const setMatchDetails = () => {
         insertMatchDetails({
             teams: { [firstTeamName]: firstTeamPlayers, [secondTeamName]: secondTeamPlayers },
             matchType: matchType,
-            totalOversInOneInning: totalOversInOneInning,
+            totalOversPerInning: totalOversPerInning,
             tossResult: tossResult,
             maxOversPerBowler: maxOversPerBowler,
             totalPlayersPerSide: firstTeamPlayers.length
@@ -78,7 +78,7 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
                 </div>
                 <div className="p-field p-col-12 p-md-3">
                     <label htmlFor="overs">No. of Overs</label>
-                    <Dropdown inputId="overs" value={totalOversInOneInning} options={oversOptions} onChange={(e) => setTotalOvers(e.value)} placeholder="Select" optionLabel="name" />
+                    <Dropdown inputId="overs" value={totalOversPerInning} options={oversOptions} onChange={(e) => setTotalOvers(e.value)} placeholder="Select" optionLabel="name" />
                 </div>
                 <div className="p-field p-col-12 p-md-3">
                     <label htmlFor="overs">Max. Overs Per Bowler</label>

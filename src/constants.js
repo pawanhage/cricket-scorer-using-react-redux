@@ -12,7 +12,7 @@ export const NO_BALL = 'NB';
 export const LEG_BYES = 'LB';
 export const BYES = 'B';
 export const PENALTY_RUNS = 'PEN';
-export const NO_BALL_OFF_BAT = "NO BALL HIT BY BATSMAN"
+export const NO_BALL_OFF_BAT = "nb"
 
 export const YET_TO_BAT = 'YTB';
 export const OUT = 'O';

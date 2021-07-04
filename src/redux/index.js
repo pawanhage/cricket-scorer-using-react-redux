@@ -91,6 +91,10 @@ export const getCurrentRunRate = (match) => {
     return calculateCurrentRunRate(match.innings[match.currentInningIndex].totalScore, match.innings[match.currentInningIndex].overs);
 }
 
+export const getTotalOversPerInning = (match) => {
+    return match.details.totalOversPerInning;
+}
+
 const initialState = {
     details: null,
     innings: [],

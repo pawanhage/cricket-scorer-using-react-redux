@@ -12,7 +12,8 @@ import {
     YET_TO_BAT,
     LEG_BYES,
     BYES,
-    PENALTY_RUNS
+    PENALTY_RUNS,
+    NO_BALL_OFF_BAT
 } from "../constants";
 
 export const formInning = (battingTeam, battingTeamPlayers, bowlingTeam, bowlingTeamPlayers) => {
@@ -88,7 +89,7 @@ export const getUpdatedBatsmanStats = (batsman, currentBall) => {
     }
 }
 
-export const getBatsmanWicketDetails = (batsman, wicketType, bowler, player) => {
+export const getBatsmanWicketDetails = (batsman, wicketType, bowler, outBy) => {
     let newBatsmanStats = {
         ...batsman,
         wicketDetails: {
@@ -96,32 +97,16 @@ export const getBatsmanWicketDetails = (batsman, wicketType, bowler, player) => 
             bowler: bowler
         }
     }
-    if (wicketType === RUN_OUT) {
+    if (wicketType === RUN_OUT || wicketType === CAUGHT_BY || wicketType === STUMPED) {
         newBatsmanStats = {
             ...newBatsmanStats,
             wicketDetails: {
                 ...newBatsmanStats.wicketDetails,
-                runOutBy: player
+                outBy: outBy
             }
         }
-    } else if (wicketType === CAUGHT_BY) {
-        newBatsmanStats = {
-            ...newBatsmanStats,
-            wicketDetails: {
-                ...newBatsmanStats.wicketDetails,
-                caughtBy: player,
-            }
-        }
-    } else if (wicketType === STUMPED) {
-        newBatsmanStats = {
-            ...newBatsmanStats,
-            wicketDetails: {
-                ...newBatsmanStats.wicketDetails,
-                stumpedBy: player,
-            }
-        }
+        return newBatsmanStats;
     }
-    return newBatsmanStats;
 }
 
 export const getRunsFromCurrentBall = (currentBall) => {
@@ -164,7 +149,7 @@ export const getTotalOverNumber = (totalOvers) => {
 }
 
 export const isWicketBall = (currentBall) => {
-    return currentBall.split('').includes(WICKET);
+    return currentBall.some((ball) => ball === WICKET);
 }
 
 export const incrementMaidenOverCount = (bowler) => {
@@ -219,13 +204,9 @@ export const getInningsCurrentOverStats = (currentOver, currentBall) => {
     }
 }
 
-export const getExtraBallIndex = (ball) => {
+export const getExtraBallIndex = (currentBall) => {
     let index;
-    if (ball.length > 1) {
-        index = 1;
-    } else {
-        index = [WIDE, NO_BALL, LEG_BYES, BYES, PENALTY_RUNS].includes(ball[0]) ? 0 : -1;
-    }
+    index = currentBall.findIndex((ball) => [WIDE, NO_BALL, LEG_BYES, BYES, PENALTY_RUNS, NO_BALL_OFF_BAT].includes(ball));
     return index;
 }
 
@@ -299,39 +280,6 @@ export const calculateRequiredRunRate = (totalScore, target, currentOvers, overs
     return Number((((target - totalScore) / totalBallsRemained) * 6).toFixed(2));
 }
 
-export const getUpdatedInningStats = (currentInningIndex, currentBall) => {
-    const ball = currentBall.split('');
-    if (isWicketBall(currentBall)) {
-        currentInningIndex = {
-            ...currentInningIndex,
-            totalWickets: currentInningIndex.totalWickets + 1
-        }
-    }
-
-    const index = getExtraBallIndex(ball);
-    if (index > -1) {
-        let ext = getExtrasFromCurrentBall(currentBall);
-        currentInningIndex = {
-            ...currentInningIndex,
-            extras: {
-                ...currentInningIndex.extras,
-                wides: currentInningIndex.extras.wides + ext.wides,
-                noBalls: currentInningIndex.extras.noBalls + ext.noBalls,
-                legByes: currentInningIndex.extras.legByes + ext.legByes,
-                byes: currentInningIndex.extras.byes + ext.byes,
-                penaltyRuns: currentInningIndex.extras.penaltyRuns + ext.penaltyRuns
-            }
-        }
-    }
-
-    currentInningIndex = {
-        ...currentInningIndex,
-        totalScore: currentInningIndex.totalScore + getRunsFromCurrentBall(currentBall)
-    }
-
-    return currentInningIndex;
-}
-
 export const isContinueButtonDisabledForCurrentBall = (runs, extra, wicketType, whoOut, outByPlayer) => {
     let disabled = runs === null && !isNaN(runs) && !extra;
     if (wicketType) {
@@ -358,4 +306,36 @@ export const isContinueButtonDisabledForCurrentBall = (runs, extra, wicketType, 
         }
     }
     return disabled;
+}
+
+export const getUpdatedInningStats = (currentInning, currentBall, striker, nonStriker, bowler, wicketDetails) => {
+    if (isWicketBall(currentBall)) {
+        currentInning = {
+            ...currentInning,
+            totalWickets: currentInning.totalWickets + 1
+        }
+    }
+
+    const index = getExtraBallIndex(currentBall);
+    if (index > -1) {
+        let ext = getExtrasFromCurrentBall(currentBall);
+        currentInning = {
+            ...currentInning,
+            extras: {
+                ...currentInning.extras,
+                wides: currentInning.extras.wides + ext.wides,
+                noBalls: currentInning.extras.noBalls + ext.noBalls,
+                legByes: currentInning.extras.legByes + ext.legByes,
+                byes: currentInning.extras.byes + ext.byes,
+                penaltyRuns: currentInning.extras.penaltyRuns + ext.penaltyRuns
+            }
+        }
+    }
+
+    currentInning = {
+        ...currentInning,
+        totalScore: currentInning.totalScore + getRunsFromCurrentBall(currentBall)
+    }
+
+    return currentInning;
 }

@@ -39,7 +39,7 @@ import {
 } from '../constants';
 import { Button } from 'primereact/button';
 import { InputNumber } from 'primereact/inputnumber';
-import { getUpdatedBatsmanStatus, isContinueButtonDisabledForCurrentBall } from '../utils/cricketUtils';
+import { getUpdatedBatsmanStatus, getUpdatedInningStats, isContinueButtonDisabledForCurrentBall } from '../utils/cricketUtils';
 import { cloneDeep } from '../utils/common';
 import CurrentScore from './CurrentScore';
 import WicketDetails from './WicketDetails';
@@ -136,6 +136,25 @@ function UpdateScore({
         setExtraOptions([...newExtrasOptions]);
     }, [wicketDetailsState.wicketType, extra]);
 
+    const [currentBall, setCurrentBall] = useState('');
+
+    useEffect(() => {
+        let ball = [];
+        if (runs) {
+            ball.push(runs);
+        }
+
+        if (extra) {
+            ball.push(extra);
+        }
+
+        if (wicketDetailsState.wicketType) {
+            ball.push('+');
+            ball.push(WICKET);
+        }
+        setCurrentBall(ball);
+    }, [runs, extra, wicketDetailsState.wicketType])
+
     const batsmenYetToBatOrRetdHurtOptions = batsmenYetToBatOrRetdHurt.map((batsman) => {
         return { name: batsman.name, value: batsman.name }
     });
@@ -156,29 +175,49 @@ function UpdateScore({
         return { name: player, value: player }
     });
 
+    const resetBall = () => {
+        dispatchWicketDetails({ type: 'RESET_WICKET_DETAILS_STATE' });
+        setRuns(null);
+        setExtra(null);
+    }
+
+    const saveBall = () => {
+        innings[currentInningIndex] = {
+            ...innings[currentInningIndex],
+            ...getUpdatedInningStats(innings[currentInningIndex], currentBall, strikerBatsman, nonStrikerBatsman, currentBowler, wicketDetailsState)
+        }
+        updateInnings(innings);
+    }
+
     const CurrentBallDetails = () => {
         if (currentBowler && totalWickets !== totalPlayersPerSide && currentOver.status === IN_PROGRESS && !lastBall.includes(WICKET)) {
             return (
-                <div className="marg-bottom-10" >
-                    <div>
-                        <div className="marg-top-right-bottom-10">Runs</div>
+                <>
+                    <div className="marg-bottom-10" >
                         <div>
-                            <Dropdown style={{ width: "75%" }} optionLabel="label" value={runs} options={runsOptions} onChange={(e) => setRuns(e.value)} placeholder="Select" />
-                            <InputNumber disabled={extra === PENALTY_RUNS} className="marg-left-10" value={runs} onValueChange={(e) => setRuns(e.value)} mode="decimal" min={0} max={100} />
+                            <div className="marg-top-right-bottom-10">Runs</div>
+                            <div>
+                                <Dropdown style={{ width: "75%" }} optionLabel="label" value={runs} options={runsOptions} onChange={(e) => setRuns(e.value)} placeholder="Select" />
+                                <InputNumber disabled={extra === PENALTY_RUNS} className="marg-left-10" value={runs} onValueChange={(e) => setRuns(e.value)} mode="decimal" min={0} max={100} />
+                            </div>
+                            <div className="marg-top-right-bottom-10">Extras</div>
+                            <div >
+                                <Dropdown style={{ width: "100%" }} optionLabel="label" value={extra} options={extrasOptions} onChange={(e) => setExtra(e.value)} placeholder="Select" />
+                            </div>
+                            <div className="marg-top-right-bottom-10">Wicket</div>
+                            <div>
+                                <Dropdown style={{ width: "100%" }} optionLabel="label" value={wicketDetailsState.wicketType} options={wicketOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_WICKET_TYPE', payload: e.value })} placeholder="Select" />
+                            </div>
+                            <WicketDetailsContext.Provider value={{ wicketDetails: wicketDetailsState, dispatchWicketDetails: dispatchWicketDetails, currentBatsmanOptions: currentBatsmanOptions, bowlingTeamPlayersOptions: bowlingTeamPlayersOptions }}>
+                                <WicketDetails></WicketDetails>
+                            </WicketDetailsContext.Provider>
                         </div>
-                        <div className="marg-top-right-bottom-10">Extras</div>
-                        <div >
-                            <Dropdown style={{ width: "100%" }} optionLabel="label" value={extra} options={extrasOptions} onChange={(e) => setExtra(e.value)} placeholder="Select" />
-                        </div>
-                        <div className="marg-top-right-bottom-10">Wicket</div>
-                        <div>
-                            <Dropdown style={{ width: "100%" }} optionLabel="label" value={wicketDetailsState.wicketType} options={wicketOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_WICKET_TYPE', payload: e.value })} placeholder="Select" />
-                        </div>
-                        <WicketDetailsContext.Provider value={{ wicketDetails: wicketDetailsState, dispatchWicketDetails: dispatchWicketDetails, currentBatsmanOptions: currentBatsmanOptions, bowlingTeamPlayersOptions: bowlingTeamPlayersOptions }}>
-                            <WicketDetails></WicketDetails>
-                        </WicketDetailsContext.Provider>
                     </div>
-                </div>
+                    <div style={{ "textAlignLast": "center" }}>
+                        <Button style={{ "marginRight": "10px" }} type="button" label="Reset Ball" onClick={() => resetBall()} />
+                        <Button type="button" disabled={isContinueButtonDisabledForCurrentBall(runs, extra, wicketDetailsState.wicketType, wicketDetailsState.whoOut, wicketDetailsState.outByPlayer)} label="Save Ball" onClick={() => saveBall()} />
+                    </div>
+                </>
             )
         }
         return <></>;
@@ -211,13 +250,13 @@ function UpdateScore({
                 });
             }
         }
-
         updateInnings(innings);
     }
 
-    const ChooseBatsman = () => {
+    const ChooseBatsmanAndBowler = () => {
+        let batsmanBowlerJsx = [];
         if (batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide) {
-            return (
+            batsmanBowlerJsx.push(
                 <div className="marg-bottom-10" >
                     {/* Choose New Batsmen */}
                     <div className="marg-top-right-bottom-10" >On Strike End</div>
@@ -227,7 +266,7 @@ function UpdateScore({
                 </div>
             )
         } else if (totalWickets < totalPlayersPerSide - 1 && lastBall === WICKET) {
-            return (
+            batsmanBowlerJsx.push(
                 <div className="marg-bottom-10" >
                     {/* Choose Batsman after wicket gone */}
                     <div className="marg-top-right-bottom-10">Current Batsman</div>
@@ -243,22 +282,24 @@ function UpdateScore({
                         <label htmlFor="striker2">Striker</label>
                     </div>
                 </div>
-            )
-        } else {
-            return <></>
+            );
         }
-    }
-
-    const ChooseCurrentBowler = () => {
         if (!currentBowler || currentOver.status === COMPLETE) {
-            return (
+            batsmanBowlerJsx.push(
                 <div className="marg-bottom-10" >
                     <div className="marg-top-right-bottom-10">Choose Bowler</div>
                     <Dropdown style={{ width: "100%" }} optionLabel="name" value={nextBowler} options={nextPossibleBowlersOptions} onChange={(e) => setCurrentBowler(e.value)} placeholder="Select" />
                 </div>
-            )
+            );
         }
-        return <></>;
+        if (batsmanBowlerJsx.length) {
+            batsmanBowlerJsx.push(
+                <div className="display-grid ">
+                    <Button type="button" disabled={!batsmanOnStrike || !batsmanOnNonStrike || !nextBowler} label="Continue" onClick={() => continueMatch()} />
+                </div>
+            );
+        }
+        return batsmanBowlerJsx;
     }
 
     return (
@@ -273,26 +314,8 @@ function UpdateScore({
                 </div>
                 <div className="rca-column-6">
                     <div className="rca-medium-widget rca-padding rca-top-border">
-                        <ChooseBatsman></ChooseBatsman>
-                        <ChooseCurrentBowler></ChooseCurrentBowler>
+                        <ChooseBatsmanAndBowler></ChooseBatsmanAndBowler>
                         <CurrentBallDetails></CurrentBallDetails>
-                        {(() => {
-                            if (currentOver && currentOver.status === IN_PROGRESS && !lastBall.includes(WICKET)) {
-                                return (
-                                    <div style={{ "textAlignLast": "center" }}>
-                                        <Button style={{ "marginRight": "10px" }} type="button" label="Reset Ball" onClick={() => continueMatch()} />
-                                        <Button type="button" disabled={isContinueButtonDisabledForCurrentBall(runs, extra, wicketDetailsState.wicketType, wicketDetailsState.whoOut, wicketDetailsState.outByPlayer)} label="Save Ball" onClick={() => continueMatch()} />
-                                    </div>
-                                )
-                            } else {
-                                return (
-                                    <div className="display-grid ">
-                                        <Button type="button" disabled={!batsmanOnStrike || !batsmanOnNonStrike || !nextBowler} label="Continue" onClick={() => continueMatch()} />
-                                    </div>
-                                )
-                            }
-                        })()
-                        }
                     </div>
                 </div >
             </div>

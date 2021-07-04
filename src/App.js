@@ -12,7 +12,7 @@ function App() {
                     <div className="rca-column-12">
                         <div className="rca-logo">
                             <h2>
-                                <span><img src="src/images/logo-01.png" style={{ width: "50px" }} alt="Logo" /></span><span>Cricket Scorer</span>
+                                <span><img src="src/images/logo-01.png" style={{ width: "50px" }} alt="" /></span><span>Cricket Scorer</span>
                             </h2>
                         </div>
                     </div>
