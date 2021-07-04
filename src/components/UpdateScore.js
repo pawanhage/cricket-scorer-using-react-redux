@@ -22,6 +22,7 @@ import {
     CAUGHT_BY,
     COMPLETE,
     EXTRAS_OPTIONS,
+    FIELD_OBSTRUCT,
     HIT_WICKET,
     IN_PROGRESS,
     LBW,
@@ -32,6 +33,7 @@ import {
     NO_BALL_OFF_BAT,
     PENALTY_RUNS,
     RUNS_OPTIONS,
+    RUN_OUT,
     STUMPED,
     WICKET,
     WICKET_OPTIONS,
@@ -136,11 +138,17 @@ function UpdateScore({
         setExtraOptions([...newExtrasOptions]);
     }, [wicketDetailsState.wicketType, extra]);
 
+    useEffect(() => {
+        if ([CAUGHT_BY, STUMPED, FIELD_OBSTRUCT, RUN_OUT].includes(wicketDetailsState.wicketType)) {
+            dispatchWicketDetails({ type: 'SET_WHO_OUT', payload: null });
+            dispatchWicketDetails({ type: 'SET_OUT_BY_PLAYER', payload: null });
+        }
+    }, [wicketDetailsState.wicketType])
     const [currentBall, setCurrentBall] = useState('');
 
     useEffect(() => {
         let ball = [];
-        if (runs) {
+        if (runs || runs === 0) {
             ball.push(runs);
         }
 
@@ -182,6 +190,7 @@ function UpdateScore({
     }
 
     const saveBall = () => {
+        console.log(getUpdatedInningStats(innings[currentInningIndex], currentBall, strikerBatsman, nonStrikerBatsman, currentBowler, wicketDetailsState));
         innings[currentInningIndex] = {
             ...innings[currentInningIndex],
             ...getUpdatedInningStats(innings[currentInningIndex], currentBall, strikerBatsman, nonStrikerBatsman, currentBowler, wicketDetailsState)

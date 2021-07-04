@@ -63,11 +63,11 @@ function CurrentScore({
                                     if (currentOver) {
                                         currentOver.details.map((ball) => {
                                             let clsName = '';
-                                            if (ball.contains('6') || ball.contains('4')) {
+                                            if (ball.includes('6') || ball.includes('4')) {
                                                 clsName = 'b6';
                                             }
 
-                                            if (ball.contains('W') && !ball.contains('WD')) {
+                                            if (ball.includes('W') && !ball.includes('WD')) {
                                                 clsName = 'w';
                                             }
                                             return <li className={clsName}>ball</li>

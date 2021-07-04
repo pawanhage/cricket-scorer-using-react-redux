@@ -13,7 +13,11 @@ import {
     LEG_BYES,
     BYES,
     PENALTY_RUNS,
-    NO_BALL_OFF_BAT
+    NO_BALL_OFF_BAT,
+    BOWLED,
+    LBW,
+    HIT_WICKET,
+    OUT
 } from "../constants";
 
 export const formInning = (battingTeam, battingTeamPlayers, bowlingTeam, bowlingTeamPlayers) => {
@@ -64,13 +68,12 @@ export const getUpdatedBatsmanStatus = (batsman, status) => {
 }
 
 export const getUpdatedBatsmanStats = (batsman, currentBall) => {
-    const ball = currentBall.split('');
     let runs = 0;
     let isBallFacedByBatsman = false;
-    let index = getExtraBallIndex(ball);
-    if (index === 1) {
-        runs = ball[index] === NO_BALL ? getRunsFromCurrentBall(currentBall) - 1 : 0;
-        isBallFacedByBatsman = ball[index] !== WIDE ? true : false;
+    let index = getExtraBallIndex(currentBall);
+    if (index > -1) {
+        runs = currentBall[index] === NO_BALL_OFF_BAT ? getRunsFromCurrentBall(currentBall) - 1 : 0;
+        isBallFacedByBatsman = currentBall[index] !== WIDE || currentBall[index] !== NO_BALL ? true : false;
     }
     const runsScored = batsman.runsScored + runs;
     const fours = runs % 4 === 0 ? batsman.fours + (runs / 4) : batsman.fours;
@@ -110,31 +113,23 @@ export const getBatsmanWicketDetails = (batsman, wicketType, bowler, outBy) => {
 }
 
 export const getRunsFromCurrentBall = (currentBall) => {
-    currentBall = currentBall.split('');
-
     const getRun = (ball) => {
         if (isNaN(Number(ball))) {
             if (ball === WICKET) {
                 return 0;
-            } else if ([WIDE, NO_BALL].includes(ball)) {
+            } else if ([WIDE, NO_BALL, NO_BALL_OFF_BAT].includes(ball)) {
                 return 1;
             }
         } else {
             return Number(ball);
         }
     }
-
-    if (currentBall.length === 2) {
-        return getRun(currentBall[0]) + getRun(currentBall[1]);
-    } else if (currentBall.length === 1) {
-        return getRun(currentBall[0]);
-    } else {
-        console.log('Error in getRunsFromCurrentBall, check it now');
-    }
+    console.log('Total Runs from ball', currentBall.reduce((acc, curr) => acc = acc + getRun(curr), 0));
+    return currentBall.reduce((acc, curr) => acc = acc + getRun(curr), 0);
 }
 
 export const isLegalDelivery = (currentBall) => {
-    return currentBall.split('').filter((ball) => ball === WIDE || ball === NO_BALL).length ? true : false;
+    return currentBall.some((ball) => ball !== WIDE || ball !== NO_BALL);
 }
 
 export const getTotalOverNumber = (totalOvers) => {
@@ -152,6 +147,13 @@ export const isWicketBall = (currentBall) => {
     return currentBall.some((ball) => ball === WICKET);
 }
 
+export const isWicketTakenByBowler = (wicketDetails) => {
+    if (Object.keys(wicketDetails).some((key) => wicketDetails[key])) {
+        return [BOWLED, LBW, CAUGHT_BY, STUMPED, HIT_WICKET].includes(wicketDetails.wicketType);
+    }
+    return false;
+}
+
 export const incrementMaidenOverCount = (bowler) => {
     return {
         ...bowler,
@@ -160,15 +162,16 @@ export const incrementMaidenOverCount = (bowler) => {
 }
 
 export const getUpdatedBowlerStats = (bowler, currentBall) => {
-    const runsGiven = getRunsFromCurrentBall(currentBall);
+    let runsGiven = getRunsFromCurrentBall(currentBall);
     if (isLegalDelivery(currentBall)) {
         const totalOvers = getTotalOverNumber(bowler.totalOvers);
-        const wicketsTaken = isWicketBall(currentBall) ? bowler.wicketsTaken + 1 : bowler.wicketsTaken;
+        if (currentBall.includes(LEG_BYES) || currentBall.includes(BYES)) {
+            runsGiven = 0;
+        }
         return {
             ...bowler,
             totalOvers: totalOvers,
-            runsGiven: runsGiven,
-            wicketsTaken: wicketsTaken
+            runsGiven: runsGiven
         }
     } else {
         return {
@@ -218,30 +221,29 @@ export const getExtrasFromCurrentBall = (currentBall) => {
         byes: 0,
         penaltyRuns: 0
     };
-    const ball = currentBall.split('');
-    const index = getExtraBallIndex(ball);
+    const index = getExtraBallIndex(currentBall);
     if (index > -1) {
-        if (ball[index] === WIDE) {
+        if (currentBall[index] === WIDE) {
             extras = {
                 ...extras,
                 wides: getRunsFromCurrentBall(currentBall)
             }
-        } else if (ball[index] === NO_BALL) {
+        } else if (currentBall[index] === NO_BALL || currentBall[index] === NO_BALL_OFF_BAT) {
             extras = {
                 ...extras,
                 noBalls: 1
             }
-        } else if (ball[index] === LEG_BYES) {
+        } else if (currentBall[index] === LEG_BYES) {
             extras = {
                 ...extras,
                 legByes: getRunsFromCurrentBall(currentBall)
             }
-        } else if (ball[index] === BYES) {
+        } else if (currentBall[index] === BYES) {
             extras = {
                 ...extras,
                 byes: getRunsFromCurrentBall(currentBall)
             }
-        } else if (ball[index] === PENALTY_RUNS) {
+        } else if (currentBall[index] === PENALTY_RUNS) {
             extras = {
                 ...extras,
                 penaltyRuns: getRunsFromCurrentBall(currentBall)
@@ -309,6 +311,14 @@ export const isContinueButtonDisabledForCurrentBall = (runs, extra, wicketType, 
 }
 
 export const getUpdatedInningStats = (currentInning, currentBall, striker, nonStriker, bowler, wicketDetails) => {
+
+    // handleOvers
+    currentInning.overs[currentInning.overs.length - 1] = {
+        ...currentInning.overs[currentInning.overs.length - 1],
+        details: [...currentInning.overs[currentInning.overs.length - 1].details, currentBall.join('')]
+    }
+
+    // handleTotalWickets
     if (isWicketBall(currentBall)) {
         currentInning = {
             ...currentInning,
@@ -316,7 +326,8 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
         }
     }
 
-    const index = getExtraBallIndex(currentBall);
+    // const handleExtras
+    let index = getExtraBallIndex(currentBall);
     if (index > -1) {
         let ext = getExtrasFromCurrentBall(currentBall);
         currentInning = {
@@ -332,10 +343,71 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
         }
     }
 
+    // handleTotalScore
     currentInning = {
         ...currentInning,
         totalScore: currentInning.totalScore + getRunsFromCurrentBall(currentBall)
     }
 
+    // handleStrikerBatsmanDetails 
+    index = currentInning.batsmen.findIndex((batsman) => batsman.name === striker.name);
+    if (index > -1) {
+        currentInning.batsmen[index] = {
+            ...currentInning.batsmen[index],
+            ...getUpdatedBatsmanStats(currentInning.batsmen[index], currentBall)
+        }
+    }
+
+    // handleNonStrikerBatsmanDetails 
+    if (!(currentBall[0] % 2)) {
+        index = currentInning.batsmen.findIndex((batsman) => batsman.name === nonStriker.name);
+        if (index > -1) {
+            currentInning.batsmen[index] = {
+                ...currentInning.batsmen[index],
+                status: NOT_OUT_ON_STRIKE
+            };
+        };
+    }
+
+    // handleBowlerDetails
+    index = currentInning.bowlers.findIndex((b) => b.name === bowler.name);
+    if (index > -1) {
+        currentInning.bowlers[index] = {
+            ...currentInning.bowlers[index],
+            ...getUpdatedBowlerStats(currentInning.bowlers[index], currentBall),
+            wicketsTaken: isWicketTakenByBowler(wicketDetails) ? currentInning.bowlers[index].wicketsTaken + 1 : currentInning.bowlers[index].wicketsTaken
+        }
+    }
+
+    // handleWicketDetailsForBatsman 
+    if (Object.keys(wicketDetails).some((key) => wicketDetails[key])) {
+        if ([LBW, BOWLED, CAUGHT_BY, STUMPED].includes(wicketDetails.wicketType)) {
+            index = currentInning.batsmen.findIndex((batsman) => batsman.name === striker.name);
+            if (index > -1) {
+                currentInning.batsmen[index] = {
+                    ...currentInning.batsmen[index],
+                    status: OUT,
+                    wicketDetails: {
+                        bowler: bowler.name,
+                        type: wicketDetails.wicketType,
+                        outBy: wicketDetails.outBy
+                    }
+                }
+            }
+        } else {
+            index = currentInning.batsmen.findIndex((batsman) => batsman.name === wicketDetails.whoOut);
+            if (index > -1) {
+                currentInning.batsmen[index] = {
+                    ...currentInning.batsmen[index],
+                    status: OUT,
+                    wicketDetails: {
+                        bowler: bowler.name,
+                        type: wicketDetails.wicketType,
+                        outBy: wicketDetails.outBy
+                    }
+                }
+            }
+        }
+    }
     return currentInning;
 }
