@@ -101,27 +101,27 @@ function CurrentScore({
     } else {
         return (
             <>
-                <div class="rca-right rca-basic-text">12th Feb 2016</div>
-                <div class="rca-clear"></div>
-                <div class="rca-padding">
-                    <h3 class="rca-match-title rca-theme-text">
+                <div className="rca-right rca-basic-text">12th Feb 2016</div>
+                <div className="rca-clear"></div>
+                <div className="rca-padding">
+                    <h3 className="rca-match-title rca-theme-text">
                         {currentInning.battingTeam} vs {currentInning.bowlingTeam}
                     </h3>
-                    <p class="rca-match-info">
+                    <p className="rca-match-info">
                         <span>{totalOversPerInning} Over Match</span>
                     </p>
-                    <div class="rca-top-padding">
-                        <div class="rca-teams rca-table">
-                            <div class="team rca-cell">{currentInning.battingTeam}</div>
-                            <div class="rca-vs rca-cell"></div>
-                            <div class="team rca-cell">{currentInning.bowlingTeam}</div>
+                    <div className="rca-top-padding">
+                        <div className="rca-teams rca-table">
+                            <div className="team rca-cell">{currentInning.battingTeam}</div>
+                            <div className="rca-vs rca-cell"></div>
+                            <div className="team rca-cell">{currentInning.bowlingTeam}</div>
                         </div>
                     </div>
-                    <div class="rca-match-start">
+                    <div className="rca-match-start">
                         <h3>Starts in</h3>
-                        <div class="rca-padding">
+                        <div className="rca-padding">
                             <h2>Few Minutes</h2>
-                            <p class="rca-center">
+                            <p className="rca-center">
                                 {Date()}
                             </p>
                         </div>

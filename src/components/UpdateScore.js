@@ -148,7 +148,7 @@ function UpdateScore({
 
     useEffect(() => {
         let ball = [];
-        if (runs || runs === 0) {
+        if (runs) {
             ball.push(runs);
         }
 
@@ -190,7 +190,6 @@ function UpdateScore({
     }
 
     const saveBall = () => {
-        console.log(getUpdatedInningStats(innings[currentInningIndex], currentBall, strikerBatsman, nonStrikerBatsman, currentBowler, wicketDetailsState));
         innings[currentInningIndex] = {
             ...innings[currentInningIndex],
             ...getUpdatedInningStats(innings[currentInningIndex], currentBall, strikerBatsman, nonStrikerBatsman, currentBowler, wicketDetailsState)
@@ -255,7 +254,8 @@ function UpdateScore({
                 innings[currentInningIndex].overs.push({
                     details: [],
                     bowlerName: nextBowler,
-                    status: IN_PROGRESS
+                    status: IN_PROGRESS,
+                    totalRunsInThisOver: 0
                 });
             }
         }
