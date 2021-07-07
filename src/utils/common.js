@@ -20,3 +20,7 @@ export const cloneDeep = (source, destination = {}) => {
     }
     return destination;
 }
+
+export const isN = (number) => {
+    return !isNaN(number);
+}

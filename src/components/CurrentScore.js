@@ -60,8 +60,8 @@ function CurrentScore({
                         <ul className="rca-ball-by">
                             {
                                 (() => {
-                                    if (currentOver) {
-                                        currentOver.details.map((ball) => {
+                                    if (currentOver && currentOver.details.length) {
+                                        return currentOver.details.map((ball) => {
                                             let clsName = '';
                                             if (ball.includes('6') || ball.includes('4')) {
                                                 clsName = 'b6';
@@ -70,7 +70,7 @@ function CurrentScore({
                                             if (ball.includes('W') && !ball.includes('WD')) {
                                                 clsName = 'w';
                                             }
-                                            return <li className={clsName}>ball</li>
+                                            return <li className={clsName}>{ball}</li>
                                         });
                                     }
                                     return <>-</>

@@ -19,6 +19,7 @@ import {
     HIT_WICKET,
     OUT
 } from "../constants";
+import { isN } from "./common";
 
 export const formInning = (battingTeam, battingTeamPlayers, bowlingTeam, bowlingTeamPlayers) => {
     return {
@@ -74,7 +75,7 @@ export const getUpdatedBatsmanStats = (batsman, currentBall) => {
     if (index > -1) {
         if (currentBall[index] === NO_BALL_OFF_BAT) {
             runs = runs - 1;
-        } else if ([WIDE, LEG_BYES, BYES].includes(currentBall[index])) {
+        } else if ([WIDE, LEG_BYES, BYES, NO_BALL].includes(currentBall[index])) {
             runs = 0;
         }
         isBallFacedByBatsman = [WIDE, NO_BALL].includes(currentBall[index]) ? false : true;
@@ -82,9 +83,9 @@ export const getUpdatedBatsmanStats = (batsman, currentBall) => {
     const runsScored = batsman.runsScored + runs;
     const fours = runs % 4 === 0 ? batsman.fours + (runs / 4) : batsman.fours;
     const sixes = runs % 6 === 0 ? batsman.sixes + (runs / 6) : batsman.sixes;
-    const ballsFaced = isBallFacedByBatsman ? batsman.ballsFaced + 1 : batsman.ballFaced;
+    const ballsFaced = isBallFacedByBatsman ? batsman.ballsFaced + 1 : batsman.ballsFaced;
     const strikeRate = Number(((100 * runsScored) / ballsFaced).toFixed(2));
-    const status = (!isNaN(currentBall[0]) && currentBall[0] % 2 === 0) ? NOT_OUT_ON_STRIKE : NOT_OUT_ON_NON_STRIKE
+    const status = (isN(currentBall[0]) && currentBall[0] % 2 === 0) ? NOT_OUT_ON_STRIKE : NOT_OUT_ON_NON_STRIKE
     return {
         ...batsman,
         runsScored: runsScored,
@@ -123,6 +124,8 @@ export const getRunsFromCurrentBall = (currentBall) => {
                 return 0;
             } else if ([WIDE, NO_BALL, NO_BALL_OFF_BAT].includes(ball)) {
                 return 1;
+            } else {
+                return 0;
             }
         } else {
             return Number(ball);
@@ -133,7 +136,11 @@ export const getRunsFromCurrentBall = (currentBall) => {
 }
 
 export const isLegalDelivery = (currentBall) => {
-    return currentBall.every((ball) => ball !== WIDE && ball !== NO_BALL && ball !== NO_BALL_OFF_BAT);
+    if (Array.isArray(currentBall)) {
+        return currentBall.every((ball) => ball !== WIDE && ball !== NO_BALL && ball !== NO_BALL_OFF_BAT);
+    } else if (typeof currentBall === 'string') {
+        return !new RegExp([WIDE, NO_BALL, NO_BALL_OFF_BAT].join('|')).test(currentBall);
+    }
 }
 
 export const getTotalOverNumber = (totalOvers) => {
@@ -195,7 +202,7 @@ export const getTotalRunsFromOver = (over) => {
 export const countLegalDeliveriesInOver = (over) => {
     let count = 0;
     if (over.length) {
-        count = Number(over.reduce((totalLegalDeliveries, currentBall) => totalLegalDeliveries + Number(isLegalDelivery([currentBall])), 0));
+        count = Number(over.reduce((totalLegalDeliveries, currentBall) => totalLegalDeliveries + Number(isLegalDelivery(currentBall)), 0));
     }
     return count;
 }
@@ -273,7 +280,7 @@ export const calculateCurrentRunRate = (totalScore, currentOvers) => {
     const totalOvers = getTotalOvers(currentOvers);
     const [overs] = String(totalOvers).split('.');
     const balls = String(totalOvers).split('.')[1] ? String(totalOvers).split('.')[1] : 0;
-    const totalBalls = (Number(overs) * 6 + balls);
+    const totalBalls = (Number(overs) * 6 + Number(balls));
     if (totalBalls === 0) {
         return 0
     }
@@ -331,11 +338,11 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
         totalRunsInThisOver: currentInning.overs[currentInning.overs.length - 1].totalRunsInThisOver + getRunsFromCurrentBall(currentBall)
     }
 
-    // handleTotalOvers
-    currentInning = {
-        ...currentInning,
-        totalOvers: [...currentInning.overs[currentInning.overs.length - 1].details, currentBall.join('')],
-    }
+    // // handleTotalOvers
+    // currentInning = {
+    //     ...currentInning,
+    //     totalOvers: [...currentInning.overs[currentInning.overs.length - 1].details, currentBall.join('')],
+    // }
 
     // handleTotalWickets
     if (isWicketBall(currentBall)) {
@@ -378,7 +385,7 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
     }
 
     // handleNonStrikerBatsmanDetails 
-    if (!(!isNaN(currentBall[0]) && currentBall[0] % 2 === 0)) {
+    if ((isN(currentBall[0]) && currentBall[0] > 0 && currentBall[0] % 2 !== 0)) {
         index = currentInning.batsmen.findIndex((batsman) => batsman.name === nonStriker.name);
         if (index > -1) {
             currentInning.batsmen[index] = {

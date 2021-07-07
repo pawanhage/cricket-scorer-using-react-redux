@@ -148,7 +148,7 @@ function UpdateScore({
 
     useEffect(() => {
         let ball = [];
-        if (runs) {
+        if (runs || runs === 0) {
             ball.push(runs);
         }
 
@@ -232,7 +232,7 @@ function UpdateScore({
     }
 
     const continueMatch = () => {
-        if (lastBall !== WICKET) {
+        if (batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide) {
             let index = innings[currentInningIndex].batsmen.findIndex((batsman) => batsman.name === batsmanOnStrike);
             if (index > -1) {
                 innings[currentInningIndex].batsmen[index] = {
@@ -248,7 +248,7 @@ function UpdateScore({
             }
         }
 
-        if (!currentOver) {
+        if (!currentOver || currentOver.status === COMPLETE) {
             let index = innings[currentInningIndex].bowlers.findIndex((bowler) => bowler.name === nextBowler);
             if (index > -1) {
                 innings[currentInningIndex].overs.push({

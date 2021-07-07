@@ -30,13 +30,18 @@ export const getNextPossibleBowlers = (match) => {
     let overs = match.innings[match.currentInningIndex].overs;
     return match.innings[match.currentInningIndex].bowlers.filter((bowler) => {
         if (overs.length === 0) {
-            return true
-        } else if (overs[overs.length - 1].bowlerName === bowler.name) {
-            return false;
-        } else if (bowler.totalOvers !== match.details.maxOversPerBowler) {
             return true;
+        } else {
+            if (overs[overs.length - 1].bowlerName !== bowler.name) {
+                if (Number(bowler.totalOvers) < match.details.maxOversPerBowler) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
-        return true;
     });
 }
 
