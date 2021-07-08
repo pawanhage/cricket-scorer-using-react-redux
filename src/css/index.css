@@ -406,8 +406,11 @@ button {
   .rca-ball-by li {
     display: inline-block;
     border-radius: 50%;
-    width: 25px;
-    height: 25px;
+    width: 50px;
+    height: 40px;
+    line-height: 37px;
+    font-size: 14px;
+    font-weight: 700;
     text-align: center;
     line-height: 21px;
     margin-right: 1px;

@@ -76,7 +76,7 @@ export const getCurrentInning = (match) => {
 export const getLastBall = (match) => {
     let overs = match.innings[match.currentInningIndex].overs;
     let lastOver = overs.length > 0 && overs[overs.length - 1];
-    let lastBall = lastOver && lastOver.length > 0 && lastOver.details[lastOver.length - 1];
+    let lastBall = lastOver && lastOver.details.length > 0 && lastOver.details[lastOver.details.length - 1];
     return lastBall ? lastBall : '';
 }
 

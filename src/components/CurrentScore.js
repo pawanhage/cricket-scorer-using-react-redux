@@ -36,21 +36,44 @@ function CurrentScore({
                     </p>
                     {
                         (() => {
-                            if (strikerBatsman || nonStrikerBatsman) {
-                                return (
-                                    <div className="rca-top-padding">
-                                        <div className="rca-batsman striker">
-                                            <span className="player">{strikerBatsman.name}</span>
-                                            <span>{strikerBatsman.runsScored}({strikerBatsman.ballsFaced})</span>
-                                        </div>
-                                        <div className="rca-batsman">
-                                            <span className="player">{nonStrikerBatsman.name}</span>
-                                            <span>{nonStrikerBatsman.runsScored}({nonStrikerBatsman.ballsFaced})</span>
-                                        </div>
+                            return (
+                                <div className="rca-top-padding">
+                                    <div className="rca-batsman striker">
+                                        {(() => {
+                                            if (strikerBatsman) {
+                                                return (
+                                                    <>
+                                                        <span className="player">{strikerBatsman.name}</span>
+                                                        <span>{strikerBatsman.runsScored}({strikerBatsman.ballsFaced})</span>
+                                                    </>
+                                                )
+                                            } else {
+                                                <>
+                                                    <span className="player">-</span>
+                                                    <span>-(-)</span>
+                                                </>
+                                            }
+                                        })()}
                                     </div>
-                                )
-                            }
-                            return <></>
+                                    <div className="rca-batsman">
+                                        {(() => {
+                                            if (nonStrikerBatsman) {
+                                                return (
+                                                    <>
+                                                        <span className="player">{nonStrikerBatsman.name}</span>
+                                                        <span>{nonStrikerBatsman.runsScored}({nonStrikerBatsman.ballsFaced})</span>
+                                                    </>
+                                                )
+                                            } else {
+                                                <>
+                                                    <span className="player">-</span>
+                                                    <span>-(-)</span>
+                                                </>
+                                            }
+                                        })()}
+                                    </div>
+                                </div>
+                            )
                         })()
                     }
                     <div className="rca-ball-detail">

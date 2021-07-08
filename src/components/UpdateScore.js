@@ -12,7 +12,9 @@ import {
     updateInnings,
     getLastBall,
     getCurrentOver,
-    getBowlingTeamPlayers
+    getBowlingTeamPlayers,
+    getTotalOversCount,
+    getTotalOversPerInning,
 } from '../redux';
 import { Dropdown } from 'primereact/dropdown';
 import { RadioButton } from 'primereact/radiobutton';
@@ -45,6 +47,7 @@ import { getUpdatedBatsmanStatus, getUpdatedInningStats, isContinueButtonDisable
 import { cloneDeep } from '../utils/common';
 import CurrentScore from './CurrentScore';
 import WicketDetails from './WicketDetails';
+import { ToggleButton } from 'primereact/togglebutton';
 
 const initialWicketDetailsState = {
     wicketType: null,
@@ -83,13 +86,41 @@ function UpdateScore({
     lastBall,
     currentOver,
     bowlingTeamPlayers,
+    totalOvers,
+    totalOversPerInning,
     updateInnings
 }) {
 
     const [batsmanOnStrike, setBatsmanOnStrike] = useState(strikerBatsman ? strikerBatsman.name : null);
     const [batsmanOnNonStrike, setBatsmanOnNonStrike] = useState(nonStrikerBatsman ? nonStrikerBatsman.name : null);
+
     const [nextBowler, setCurrentBowler] = useState(null);
     const [nextBatsman, setNextBatsman] = useState(null);
+    const [isCurrentBatsmanOnStrike, setCurrentBatsmanOnStrike] = useState(true);
+
+    useEffect(() => {
+        if (lastBall.indexOf(WICKET) > -1 && lastBall.indexOf(WIDE) < 0 && batsmenNotOut.length && batsmenNotOut.length < 2) {
+            if (!isCurrentBatsmanOnStrike) {
+                if (nextBatsman) {
+                    setBatsmanOnStrike(nextBatsman);
+                } else {
+                    setBatsmanOnStrike(null);
+                }
+                if (batsmenNotOut[0].name) {
+                    setBatsmanOnNonStrike(batsmenNotOut[0].name)
+                }
+            } else {
+                if (nextBatsman) {
+                    setBatsmanOnNonStrike(nextBatsman);
+                } else {
+                    setBatsmanOnNonStrike(null);
+                }
+                if (batsmenNotOut[0].name) {
+                    setBatsmanOnStrike(batsmenNotOut[0].name)
+                }
+            }
+        }
+    }, [isCurrentBatsmanOnStrike, nextBatsman, batsmenNotOut, lastBall]);
 
     const [runsOptions, setRunsOptions] = useState(RUNS_OPTIONS);
     const [extrasOptions, setExtraOptions] = useState(EXTRAS_OPTIONS);
@@ -195,10 +226,11 @@ function UpdateScore({
             ...getUpdatedInningStats(innings[currentInningIndex], currentBall, strikerBatsman, nonStrikerBatsman, currentBowler, wicketDetailsState)
         }
         updateInnings(innings);
+        resetBall();
     }
 
     const CurrentBallDetails = () => {
-        if (currentBowler && totalWickets !== totalPlayersPerSide && currentOver.status === IN_PROGRESS && !lastBall.includes(WICKET)) {
+        if (currentBowler && totalWickets < totalPlayersPerSide - 1 && currentOver.status === IN_PROGRESS && !(batsmenNotOut.length < 2)) {
             return (
                 <>
                     <div className="marg-bottom-10" >
@@ -232,18 +264,22 @@ function UpdateScore({
     }
 
     const continueMatch = () => {
-        if (batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide) {
+        if (batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide || (lastBall.indexOf(WICKET) > -1 && lastBall.indexOf(WIDE) < 0)) {
             let index = innings[currentInningIndex].batsmen.findIndex((batsman) => batsman.name === batsmanOnStrike);
             if (index > -1) {
                 innings[currentInningIndex].batsmen[index] = {
-                    ...getUpdatedBatsmanStatus(innings[currentInningIndex].batsmen[index], NOT_OUT_ON_STRIKE)
+                    ...innings[currentInningIndex].batsmen[index],
+                    status: NOT_OUT_ON_STRIKE,
+                    order: batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide ? 0 : (innings[currentInningIndex].batsmen[index].order ? innings[currentInningIndex].batsmen[index].order : totalWickets + 1)
                 }
             }
 
             index = innings[currentInningIndex].batsmen.findIndex((batsman) => batsman.name === batsmanOnNonStrike);
             if (index > -1) {
                 innings[currentInningIndex].batsmen[index] = {
-                    ...getUpdatedBatsmanStatus(innings[currentInningIndex].batsmen[index], NOT_OUT_ON_NON_STRIKE)
+                    ...innings[currentInningIndex].batsmen[index],
+                    status: NOT_OUT_ON_NON_STRIKE,
+                    order: batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide ? 1 : (innings[currentInningIndex].batsmen[index].order ? innings[currentInningIndex].batsmen[index].order : totalWickets + 1)
                 }
             }
         }
@@ -274,26 +310,20 @@ function UpdateScore({
                     <Dropdown style={{ width: "100%" }} optionLabel="name" value={batsmanOnNonStrike} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnNonStrike(e.value)} placeholder="Select" />
                 </div>
             )
-        } else if (totalWickets < totalPlayersPerSide - 1 && lastBall === WICKET) {
+        } else if (totalWickets < totalPlayersPerSide - 1 && lastBall.indexOf(WICKET) > -1 && lastBall.indexOf(WIDE) < 0 && batsmenNotOut.length < 2) {
             batsmanBowlerJsx.push(
                 <div className="marg-bottom-10" >
                     {/* Choose Batsman after wicket gone */}
                     <div className="marg-top-right-bottom-10">Current Batsman</div>
-                    <Dropdown style={{ width: "100%" }} optionLabel="name" value={batsmenNotOut[0].name} options={batsmenNotOutOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
-                    <div className="p-field-radiobutton">
-                        <RadioButton inputId="striker1" name="striker1" onChange={(e) => setBatsmanOnStrike(batsmenNotOut[0].name)} />
-                        <label htmlFor="striker1">Striker</label>
-                    </div>
+                    <Dropdown style={{ width: "62%" }} optionLabel="name" value={batsmenNotOut[0].name} options={batsmenNotOutOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
+                    <ToggleButton style={{ width: "35%", marginLeft: "10px" }} checked={isCurrentBatsmanOnStrike} onChange={(e) => setCurrentBatsmanOnStrike(e.value)} onLabel="On Strike" offLabel="On Non Strike" onIcon="pi pi-check" offIcon="pi pi-times" />
                     <div className="marg-top-right-bottom-10">Next Batsman</div>
-                    <Dropdown style={{ width: "100%" }} optionLabel="name" options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setNextBatsman(e.value)} placeholder="Select" />
-                    <div className="p-field-radiobutton">
-                        <RadioButton inputId="striker2" name="striker2" onChange={(e) => setBatsmanOnStrike(nextBatsman)} />
-                        <label htmlFor="striker2">Striker</label>
-                    </div>
+                    <Dropdown style={{ width: "62%" }} optionLabel="name" value={nextBatsman} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setNextBatsman(e.value)} placeholder="Select" />
+                    <ToggleButton style={{ width: "35%", marginLeft: "10px" }} checked={!isCurrentBatsmanOnStrike} onChange={(e) => setCurrentBatsmanOnStrike(!e.value)} onIcon="pi pi-check" onLabel="On Strike" offLabel="On Non Strike" offIcon="pi pi-times" />
                 </div>
             );
         }
-        if (!currentBowler || currentOver.status === COMPLETE) {
+        if ((!currentBowler || currentOver.status === COMPLETE) && totalOvers < totalOversPerInning) {
             batsmanBowlerJsx.push(
                 <div className="marg-bottom-10" >
                     <div className="marg-top-right-bottom-10">Choose Bowler</div>
@@ -346,7 +376,9 @@ const mapStateToProps = (state) => {
         totalWickets: getTotalWickets(state.match),
         lastBall: getLastBall(state.match),
         currentOver: getCurrentOver(state.match),
-        bowlingTeamPlayers: getBowlingTeamPlayers(state.match)
+        bowlingTeamPlayers: getBowlingTeamPlayers(state.match),
+        totalOvers: getTotalOversCount(state.match),
+        totalOversPerInning: getTotalOversPerInning(state.match)
     }
 }
 

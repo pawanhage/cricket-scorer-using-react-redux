@@ -68,24 +68,29 @@ export const getUpdatedBatsmanStatus = (batsman, status) => {
     }
 }
 
+export const getRunsIndex = (currentBall) => {
+    return currentBall.findIndex((ball) => isN(ball));
+}
+
 export const getUpdatedBatsmanStats = (batsman, currentBall) => {
     let runs = getRunsFromCurrentBall(currentBall);
     let isBallFacedByBatsman = true;
-    let index = getExtraBallIndex(currentBall);
-    if (index > -1) {
-        if (currentBall[index] === NO_BALL_OFF_BAT) {
+    let extraIndex = getExtraBallIndex(currentBall);
+    let runIndex = getRunsIndex(currentBall);
+    if (extraIndex > -1) {
+        if (currentBall[extraIndex] === NO_BALL_OFF_BAT) {
             runs = runs - 1;
-        } else if ([WIDE, LEG_BYES, BYES, NO_BALL].includes(currentBall[index])) {
+        } else if ([WIDE, LEG_BYES, BYES, NO_BALL, PENALTY_RUNS].includes(currentBall[extraIndex])) {
             runs = 0;
         }
-        isBallFacedByBatsman = [WIDE, NO_BALL].includes(currentBall[index]) ? false : true;
+        isBallFacedByBatsman = [WIDE, NO_BALL, PENALTY_RUNS].includes(currentBall[extraIndex]) ? false : true;
     }
     const runsScored = batsman.runsScored + runs;
     const fours = runs % 4 === 0 ? batsman.fours + (runs / 4) : batsman.fours;
     const sixes = runs % 6 === 0 ? batsman.sixes + (runs / 6) : batsman.sixes;
     const ballsFaced = isBallFacedByBatsman ? batsman.ballsFaced + 1 : batsman.ballsFaced;
-    const strikeRate = Number(((100 * runsScored) / ballsFaced).toFixed(2));
-    const status = (isN(currentBall[0]) && currentBall[0] % 2 === 0) ? NOT_OUT_ON_STRIKE : NOT_OUT_ON_NON_STRIKE
+    const strikeRate = ballsFaced ? Number(((100 * runsScored) / ballsFaced).toFixed(2)) : 0;
+    const status = currentBall[runIndex] && currentBall[extraIndex] !== PENALTY_RUNS ? ((isN(currentBall[runIndex]) && currentBall[0] % 2 === 0) ? NOT_OUT_ON_STRIKE : NOT_OUT_ON_NON_STRIKE) : NOT_OUT_ON_STRIKE;
     return {
         ...batsman,
         runsScored: runsScored,
@@ -137,9 +142,9 @@ export const getRunsFromCurrentBall = (currentBall) => {
 
 export const isLegalDelivery = (currentBall) => {
     if (Array.isArray(currentBall)) {
-        return currentBall.every((ball) => ball !== WIDE && ball !== NO_BALL && ball !== NO_BALL_OFF_BAT);
+        return currentBall.every((ball) => ball !== WIDE && ball !== NO_BALL && ball !== NO_BALL_OFF_BAT && ball !== PENALTY_RUNS);
     } else if (typeof currentBall === 'string') {
-        return !new RegExp([WIDE, NO_BALL, NO_BALL_OFF_BAT].join('|')).test(currentBall);
+        return !new RegExp([WIDE, NO_BALL, NO_BALL_OFF_BAT, PENALTY_RUNS].join('|')).test(currentBall);
     }
 }
 
@@ -360,11 +365,11 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
             ...currentInning,
             extras: {
                 ...currentInning.extras,
-                wides: currentInning.extras.wides + ext.wides,
-                noBalls: currentInning.extras.noBalls + ext.noBalls,
-                legByes: currentInning.extras.legByes + ext.legByes,
-                byes: currentInning.extras.byes + ext.byes,
-                penaltyRuns: currentInning.extras.penaltyRuns + ext.penaltyRuns
+                wides: currentInning.extras.wides ? currentInning.extras.wides + ext.wides : ext.wides,
+                noBalls: currentInning.extras.noBalls ? currentInning.extras.noBalls + ext.noBalls : ext.noBalls,
+                legByes: currentInning.extras.legByes ? currentInning.extras.legByes + ext.legByes : ext.legByes,
+                byes: currentInning.extras.byes ? currentInning.extras.byes + ext.byes : ext.byes,
+                penaltyRuns: currentInning.extras.penaltyRuns ? currentInning.extras.penaltyRuns + ext.penaltyRuns : ext.penaltyRuns
             }
         }
     }
@@ -385,7 +390,8 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
     }
 
     // handleNonStrikerBatsmanDetails 
-    if ((isN(currentBall[0]) && currentBall[0] > 0 && currentBall[0] % 2 !== 0)) {
+    index = getRunsIndex(currentBall);
+    if (currentBall[getExtraBallIndex(currentBall)] !== PENALTY_RUNS && (isN(currentBall[index]) && currentBall[index] > 0 && currentBall[index] % 2 !== 0)) {
         index = currentInning.batsmen.findIndex((batsman) => batsman.name === nonStriker.name);
         if (index > -1) {
             currentInning.batsmen[index] = {
@@ -466,7 +472,7 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
                     wicketDetails: {
                         bowler: bowler.name,
                         type: wicketDetails.wicketType,
-                        outBy: wicketDetails.outBy
+                        outBy: wicketDetails.outByPlayer
                     }
                 }
             }
@@ -479,7 +485,7 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
                     wicketDetails: {
                         bowler: bowler.name,
                         type: wicketDetails.wicketType,
-                        outBy: wicketDetails.outBy
+                        outBy: wicketDetails.outByPlayer
                     }
                 }
             }
