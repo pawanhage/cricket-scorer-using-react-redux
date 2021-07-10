@@ -1,34 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './App.scss';
 import FullScorecard from './components/FullScorecard';
 import MatchDetails from './components/MatchDetails';
-import UpdateScore from './components/UpdateScore';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { Button } from 'primereact/button';
-import { Sidebar } from 'primereact/sidebar';
 import { connect } from 'react-redux';
 import { getLiveScore } from './redux';
-import ScoreBar from './components/ScoreBar';
+import CurrentScore from './components/CurrentScore';
+import UpdateScore from './components/UpdateScore';
 
-function Update({ liveScore }) {
-    const [visibleRight, setVisibleRight] = useState(false);
-    return (
-        <>
-            <Sidebar visible={visibleRight} position="right" onHide={() => setVisibleRight(false)}>
-                <h2>Update Ball By Ball</h2>
-                {<UpdateScore></UpdateScore>}
-            </Sidebar>
-            <div class="rca-logo rca-powered">
-                <h2>
-                    <Button onClick={() => setVisibleRight(true)}>
-                        <img src="https://d2muumq9nnirye.cloudfront.net/cricketapi/images/api_logo.svg" alt="" style={{ width: "50px" }} />
-                        <span><>{liveScore}</><br />(To Update Click Here)</span>
-                    </Button>
-                </h2>
-            </div>
-        </>
-    )
-}
 
 function App({ liveScore }) {
 
@@ -72,12 +51,17 @@ function App({ liveScore }) {
                 {
                     (() => {
                         if (liveScore !== '') {
-                            return <Update liveScore={liveScore}></Update>
+                            return (
+                                <>
+                                    <CurrentScore></CurrentScore>
+                                    <UpdateScore></UpdateScore>
+                                </>
+                            )
                         }
                         return <></>;
                     })()
                 }
-                <ScoreBar></ScoreBar>
+
             </div>
         </div>
     );

@@ -236,16 +236,16 @@ function UpdateScore({
                         <div>
                             <div className="marg-top-right-bottom-10">Runs</div>
                             <div>
-                                <Dropdown style={{ width: "75%" }} optionLabel="label" value={runs} options={runsOptions} onChange={(e) => setRuns(e.value)} placeholder="Select" />
+                                <Dropdown optionLabel="label" value={runs} options={runsOptions} onChange={(e) => setRuns(e.value)} placeholder="Select" />
                                 <InputNumber disabled={extra === PENALTY_RUNS} className="marg-left-10" value={runs} onValueChange={(e) => setRuns(e.value)} mode="decimal" min={0} max={100} />
                             </div>
                             <div className="marg-top-right-bottom-10">Extras</div>
                             <div >
-                                <Dropdown style={{ width: "100%" }} optionLabel="label" value={extra} options={extrasOptions} onChange={(e) => setExtra(e.value)} placeholder="Select" />
+                                <Dropdown optionLabel="label" value={extra} options={extrasOptions} onChange={(e) => setExtra(e.value)} placeholder="Select" />
                             </div>
                             <div className="marg-top-right-bottom-10">Wicket</div>
                             <div>
-                                <Dropdown style={{ width: "100%" }} optionLabel="label" value={wicketDetailsState.wicketType} options={wicketOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_WICKET_TYPE', payload: e.value })} placeholder="Select" />
+                                <Dropdown optionLabel="label" value={wicketDetailsState.wicketType} options={wicketOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_WICKET_TYPE', payload: e.value })} placeholder="Select" />
                             </div>
                             <WicketDetailsContext.Provider value={{ wicketDetails: wicketDetailsState, dispatchWicketDetails: dispatchWicketDetails, currentBatsmanOptions: currentBatsmanOptions, bowlingTeamPlayersOptions: bowlingTeamPlayersOptions }}>
                                 <WicketDetails></WicketDetails>
@@ -304,9 +304,9 @@ function UpdateScore({
                 <div className="marg-bottom-10" >
                     {/* Choose New Batsmen */}
                     <div className="marg-top-right-bottom-10" >On Strike End</div>
-                    <Dropdown style={{ width: "100%" }} optionLabel="name" value={batsmanOnStrike} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
+                    <Dropdown optionLabel="name" value={batsmanOnStrike} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
                     <div className="marg-top-right-bottom-10" >On Non Strike End</div>
-                    <Dropdown style={{ width: "100%" }} optionLabel="name" value={batsmanOnNonStrike} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnNonStrike(e.value)} placeholder="Select" />
+                    <Dropdown optionLabel="name" value={batsmanOnNonStrike} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnNonStrike(e.value)} placeholder="Select" />
                 </div>
             )
         } else if (totalWickets < totalPlayersPerSide - 1 && lastBall.indexOf(WICKET) > -1 && batsmenNotOut.length < 2) {
@@ -314,11 +314,11 @@ function UpdateScore({
                 <div className="marg-bottom-10" >
                     {/* Choose Batsman after wicket gone */}
                     <div className="marg-top-right-bottom-10">Current Batsman</div>
-                    <Dropdown style={{ width: "62%" }} optionLabel="name" value={batsmenNotOut[0].name} options={batsmenNotOutOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
-                    <ToggleButton style={{ width: "35%", marginLeft: "10px" }} checked={isCurrentBatsmanOnStrike} onChange={(e) => setCurrentBatsmanOnStrike(e.value)} onLabel="On Strike" offLabel="On Non Strike" onIcon="pi pi-check" offIcon="pi pi-times" />
+                    <Dropdown optionLabel="name" value={batsmenNotOut[0].name} options={batsmenNotOutOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
+                    <ToggleButton style={{ marginLeft: "10px" }} checked={isCurrentBatsmanOnStrike} onChange={(e) => setCurrentBatsmanOnStrike(e.value)} onLabel="On Strike" offLabel="On Non Strike" onIcon="pi pi-check" offIcon="pi pi-times" />
                     <div className="marg-top-right-bottom-10">Next Batsman</div>
-                    <Dropdown style={{ width: "62%" }} optionLabel="name" value={nextBatsman} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setNextBatsman(e.value)} placeholder="Select" />
-                    <ToggleButton style={{ width: "35%", marginLeft: "10px" }} checked={!isCurrentBatsmanOnStrike} onChange={(e) => setCurrentBatsmanOnStrike(!e.value)} onIcon="pi pi-check" onLabel="On Strike" offLabel="On Non Strike" offIcon="pi pi-times" />
+                    <Dropdown optionLabel="name" value={nextBatsman} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setNextBatsman(e.value)} placeholder="Select" />
+                    <ToggleButton style={{ marginLeft: "10px" }} checked={!isCurrentBatsmanOnStrike} onChange={(e) => setCurrentBatsmanOnStrike(!e.value)} onIcon="pi pi-check" onLabel="On Strike" offLabel="On Non Strike" offIcon="pi pi-times" />
                 </div>
             );
         }
@@ -326,7 +326,7 @@ function UpdateScore({
             batsmanBowlerJsx.push(
                 <div className="marg-bottom-10" >
                     <div className="marg-top-right-bottom-10">Choose Bowler</div>
-                    <Dropdown style={{ width: "100%" }} optionLabel="name" value={nextBowler} options={nextPossibleBowlersOptions} onChange={(e) => setCurrentBowler(e.value)} placeholder="Select" />
+                    <Dropdown optionLabel="name" value={nextBowler} options={nextPossibleBowlersOptions} onChange={(e) => setCurrentBowler(e.value)} placeholder="Select" />
                 </div>
             );
         }
@@ -343,7 +343,7 @@ function UpdateScore({
     return (
         <div>
             <div className="rca-container">
-                <div className="rca-column-6">
+                <div className="rca-column-12">
                     <div className="rca-medium-widget rca-padding rca-top-border">
                         {
                             (() => {
