@@ -136,3 +136,11 @@
 .marg-top-right-bottom-10 {
     margin: 10px 10px 10px 0px;
 }
+
+.p-sidebar-mask.p-component-overlay {
+    background: revert !important;
+}
+
+.p-sidebar-right {
+    width: auto !important;
+}

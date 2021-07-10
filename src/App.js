@@ -1,10 +1,37 @@
+import React, { useState } from 'react';
 import './App.scss';
 import FullScorecard from './components/FullScorecard';
 import MatchDetails from './components/MatchDetails';
 import UpdateScore from './components/UpdateScore';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import { Button } from 'primereact/button';
+import { Sidebar } from 'primereact/sidebar';
+import { connect } from 'react-redux';
+import { getLiveScore } from './redux';
+import ScoreBar from './components/ScoreBar';
 
-function App() {
+function Update({ liveScore }) {
+    const [visibleRight, setVisibleRight] = useState(false);
+    return (
+        <>
+            <Sidebar visible={visibleRight} position="right" onHide={() => setVisibleRight(false)}>
+                <h2>Update Ball By Ball</h2>
+                {<UpdateScore></UpdateScore>}
+            </Sidebar>
+            <div class="rca-logo rca-powered">
+                <h2>
+                    <Button onClick={() => setVisibleRight(true)}>
+                        <img src="https://d2muumq9nnirye.cloudfront.net/cricketapi/images/api_logo.svg" alt="" style={{ width: "50px" }} />
+                        <span><>{liveScore}</><br />(To Update Click Here)</span>
+                    </Button>
+                </h2>
+            </div>
+        </>
+    )
+}
+
+function App({ liveScore }) {
+
     return (
         <div>
             <div className="rca-container">
@@ -29,7 +56,6 @@ function App() {
                                                 <div>
                                                     <Switch>
                                                         <Route exact path="/" component={MatchDetails} />
-                                                        <Route path="/update-score" component={UpdateScore} />
                                                         <Route path="/full-scorecard" component={FullScorecard} />
                                                         <Route component={MatchDetails} />
                                                     </Switch>
@@ -43,25 +69,24 @@ function App() {
                         </div>
                     </div>
                 </div>
-
-                <div className="rca-row">
-                    <div className="rca-column-8">
-                        <ul className="rca-footer">
-                            <li>About Us</li>
-                            <li>Privacy Policy</li>
-                            <li>Feedback</li>
-                            <li>Site map</li>
-                        </ul>
-                    </div>
-                    <div className="rca-column-4">
-                        <ul className="rca-footer rca-right">
-                            <li>© 2016 Yoursite.com, All rights reserved </li>
-                        </ul>
-                    </div>
-                </div>
+                {
+                    (() => {
+                        if (liveScore !== '') {
+                            return <Update liveScore={liveScore}></Update>
+                        }
+                        return <></>;
+                    })()
+                }
+                <ScoreBar></ScoreBar>
             </div>
-        </div >
+        </div>
     );
 }
 
-export default App;
+const mapStateToProps = (state) => {
+    return {
+        liveScore: getLiveScore(state.match)
+    }
+}
+
+export default connect(mapStateToProps, null)(App);

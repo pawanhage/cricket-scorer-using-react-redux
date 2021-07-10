@@ -1,4 +1,4 @@
-export const WICKET = 'W';
+export const WICKET = 'WKT';
 export const RUN_OUT = 'R';
 export const CAUGHT_BY = 'C';
 export const LBW = 'LBW';
@@ -55,4 +55,3 @@ export const WICKET_OPTIONS = [
     { label: "Hit Wicket", value: HIT_WICKET, disabled: false },
     { label: "Field Obstruct", value: FIELD_OBSTRUCT, disabled: false }
 ];
-

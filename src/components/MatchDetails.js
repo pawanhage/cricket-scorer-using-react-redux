@@ -17,7 +17,7 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
     const [totalOversPerInning, setTotalOvers] = useState(5);
     const [firstTeamPlayers, setFirstTeamPlayers] = useState(['Rohit', 'Pandya', 'Pollard', 'SKY', 'Boult']);
     const [secondTeamPlayers, setSecondTeamPlayers] = useState(['MSD', 'Faf', 'Jadeja', 'Raina', 'Sam']);
-    const [tossResult, setTossResult] = useState(12);
+    const [tossResult, setTossResult] = useState(121);
     const [maxOversPerBowler, setMaxOversPerBowler] = useState(1);
 
     let history = useHistory();
@@ -30,10 +30,10 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
     let oversOptions = Array.from(Array(50).keys()).map((i) => { return { name: i + 1, value: i + 1 } });
 
     let tossResultOptions = [
-        { name: firstTeamName + ' won the toss and elected to bat first', value: 12 },
-        { name: firstTeamName + ' won the toss and elected to bowl first', value: 21 },
-        { name: secondTeamName + ' won the toss and elected to bat first', value: 21 },
-        { name: secondTeamName + ' won the toss and elected to bowl first', value: 12 }
+        { name: firstTeamName + ' won the toss and elected to bat first', value: 121 },
+        { name: firstTeamName + ' won the toss and elected to bowl first', value: 211 },
+        { name: secondTeamName + ' won the toss and elected to bat first', value: 212 },
+        { name: secondTeamName + ' won the toss and elected to bowl first', value: 122 }
     ];
 
     let maxOversPerBowlerOptions = Array.from(Array(Math.ceil(Number(totalOversPerInning / 2))).keys()).map((i) => { return { name: i + 1, value: i + 1 } });
@@ -48,17 +48,17 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
             totalPlayersPerSide: firstTeamPlayers.length
         });
         let innings = [];
-        let battingTeam = tossResult === 12 ? firstTeamName : secondTeamName;
-        let battingTeamPlayers = tossResult === 12 ? firstTeamPlayers : secondTeamPlayers;
-        let bowlingTeam = tossResult === 12 ? secondTeamName : firstTeamName;
-        let bowlingTeamPlayers = tossResult === 12 ? secondTeamPlayers : firstTeamPlayers;
+        let battingTeam = String(tossResult).includes('12') ? firstTeamName : secondTeamName;
+        let battingTeamPlayers = String(tossResult).includes('12') ? firstTeamPlayers : secondTeamPlayers;
+        let bowlingTeam = String(tossResult).includes('12') ? secondTeamName : firstTeamName;
+        let bowlingTeamPlayers = String(tossResult).includes('12') ? secondTeamPlayers : firstTeamPlayers;
 
         innings.push(formInning(battingTeam, battingTeamPlayers, bowlingTeam, bowlingTeamPlayers));
         if (matchType === ONE_DAY_MATCH) {
             innings.push(formInning(bowlingTeam, bowlingTeamPlayers, battingTeam, battingTeamPlayers));
         }
         updateInnings(innings);
-        history.push('update-score');
+        history.push('full-scorecard');
     }
 
     return (

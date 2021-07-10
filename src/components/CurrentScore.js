@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { getCurrentBowler, getCurrentInning, getCurrentOver, getCurrentRunRate, getNonStrikerBatsman, getStrikerBatsman, getTotalOversCount, getTotalOversPerInning, getTotalPlayersPerSide, getYetToBatOrRetdHurtBatsmen } from '../redux'
+import { getCurrentBowler, getCurrentInning, getCurrentOver, getCurrentRunRate, getNonStrikerBatsman, getStrikerBatsman, getTeams, getTotalOversCount, getTotalOversPerInning, getTotalPlayersPerSide, getYetToBatOrRetdHurtBatsmen } from '../redux'
 
 function CurrentScore({
     currentInning,
@@ -12,7 +12,10 @@ function CurrentScore({
     currentBowler,
     batsmenYetToBatOrRetdHurt,
     totalPlayersPerSide,
-    totalOversPerInning
+    totalOversPerInning,
+    currentInningIndex,
+    tossResult,
+    teams
 }) {
 
     if (batsmenYetToBatOrRetdHurt.length !== totalPlayersPerSide) {
@@ -25,7 +28,7 @@ function CurrentScore({
                         {currentInning.battingTeam} {currentInning.totalScore}/{currentInning.totalWickets} in {totalOvers} Overs
                     </h3>
                     <p className="rca-match-info">
-                        <span>CRR:{currentRunRate}</span>
+                        <span>CRR: {currentRunRate}</span>
                         {
                             (() => {
                                 if (currentInning.targetScore) {
@@ -38,40 +41,30 @@ function CurrentScore({
                         (() => {
                             return (
                                 <div className="rca-top-padding">
-                                    <div className="rca-batsman striker">
+                                    <>
                                         {(() => {
                                             if (strikerBatsman) {
                                                 return (
-                                                    <>
-                                                        <span className="player">{strikerBatsman.name}</span>
+                                                    <div className="rca-batsman striker">                                                        <span className="player">{strikerBatsman.name}</span>
                                                         <span>{strikerBatsman.runsScored}({strikerBatsman.ballsFaced})</span>
-                                                    </>
+                                                    </div>
                                                 )
-                                            } else {
-                                                <>
-                                                    <span className="player">-</span>
-                                                    <span>-(-)</span>
-                                                </>
                                             }
+                                            return <></>
                                         })()}
-                                    </div>
-                                    <div className="rca-batsman">
+                                    </>
+                                    <>
                                         {(() => {
                                             if (nonStrikerBatsman) {
                                                 return (
-                                                    <>
-                                                        <span className="player">{nonStrikerBatsman.name}</span>
+                                                    <div className="rca-batsman">                                                        <span className="player">{nonStrikerBatsman.name}</span>
                                                         <span>{nonStrikerBatsman.runsScored}({nonStrikerBatsman.ballsFaced})</span>
-                                                    </>
+                                                    </div>
                                                 )
-                                            } else {
-                                                <>
-                                                    <span className="player">-</span>
-                                                    <span>-(-)</span>
-                                                </>
                                             }
+                                            return <></>
                                         })()}
-                                    </div>
+                                    </>
                                 </div>
                             )
                         })()
@@ -141,13 +134,44 @@ function CurrentScore({
                         </div>
                     </div>
                     <div className="rca-match-start">
-                        <h3>Starts in</h3>
-                        <div className="rca-padding">
-                            <h2>Few Minutes</h2>
-                            <p className="rca-center">
-                                {Date()}
-                            </p>
-                        </div>
+                        {
+                            (() => {
+                                let suffix = '';
+                                if (currentInningIndex === 0) {
+                                    suffix = 'st';
+                                } else if (currentInningIndex === 1) {
+                                    suffix = 'nd';
+                                } else if (currentInningIndex === 2) {
+                                    suffix = 'rd';
+                                } else if (currentInningIndex === 3) {
+                                    suffix = 'th';
+                                }
+                                return (
+                                    <>
+                                        <h3>{currentInningIndex + 1}'{suffix} Inning</h3>
+                                    </>
+                                )
+                            })()
+                        }
+                        {
+                            (() => {
+                                if (currentInningIndex === 0) {
+                                    const whoWon = Number(String(tossResult).split('')[2]);
+                                    const decision = Number(String(tossResult).split('')[0]) === 1 ? "bat" : "bowl";
+                                    return (
+                                        <>
+                                            <h2>{currentInning.battingTeam} {currentInning.totalScore}/{currentInning.totalWickets} in {totalOvers} Overs
+                                            </h2>
+                                            <p className="rca-center">
+                                                {teams[whoWon - 1]} won the toss and elected to {decision} first
+                                            </p>
+                                        </>
+                                    )
+                                } else {
+                                    return <></>;
+                                }
+                            })()
+                        }
                     </div>
                 </div>
             </>
@@ -157,6 +181,9 @@ function CurrentScore({
 
 const mapStateToProps = (state) => {
     return {
+        teams: getTeams(state.match),
+        tossResult: state.match.details.tossResult,
+        currentInningIndex: state.match.currentInningIndex,
         currentInning: getCurrentInning(state.match),
         totalOvers: getTotalOversCount(state.match),
         currentRunRate: getCurrentRunRate(state.match),

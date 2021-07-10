@@ -100,6 +100,17 @@ export const getTotalOversPerInning = (match) => {
     return match.details.totalOversPerInning;
 }
 
+export const getTeams = (match) => {
+    return Object.keys(match.details.teams);
+}
+
+export const getLiveScore = (match) => {
+    if (match.innings[match.currentInningIndex]) {
+        return `Live ${match.innings[match.currentInningIndex].battingTeam}: ${match.innings[match.currentInningIndex].totalScore}/${match.innings[match.currentInningIndex].totalWickets} in ${getTotalOversCount(match)} Overs`;
+    }
+    return '';
+}
+
 const initialState = {
     details: null,
     innings: [],

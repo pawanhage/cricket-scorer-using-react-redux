@@ -17,7 +17,6 @@ import {
     getTotalOversPerInning,
 } from '../redux';
 import { Dropdown } from 'primereact/dropdown';
-import { RadioButton } from 'primereact/radiobutton';
 import {
     BOWLED,
     BYES,
@@ -43,7 +42,7 @@ import {
 } from '../constants';
 import { Button } from 'primereact/button';
 import { InputNumber } from 'primereact/inputnumber';
-import { getUpdatedBatsmanStatus, getUpdatedInningStats, isContinueButtonDisabledForCurrentBall } from '../utils/cricketUtils';
+import { getUpdatedInningStats, isContinueButtonDisabledForCurrentBall } from '../utils/cricketUtils';
 import { cloneDeep } from '../utils/common';
 import CurrentScore from './CurrentScore';
 import WicketDetails from './WicketDetails';
@@ -99,7 +98,7 @@ function UpdateScore({
     const [isCurrentBatsmanOnStrike, setCurrentBatsmanOnStrike] = useState(true);
 
     useEffect(() => {
-        if (lastBall.indexOf(WICKET) > -1 && lastBall.indexOf(WIDE) < 0 && batsmenNotOut.length && batsmenNotOut.length < 2) {
+        if (lastBall.indexOf(WICKET) > -1 && batsmenNotOut.length && batsmenNotOut.length < 2) {
             if (!isCurrentBatsmanOnStrike) {
                 if (nextBatsman) {
                     setBatsmanOnStrike(nextBatsman);
@@ -264,7 +263,7 @@ function UpdateScore({
     }
 
     const continueMatch = () => {
-        if (batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide || (lastBall.indexOf(WICKET) > -1 && lastBall.indexOf(WIDE) < 0)) {
+        if (batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide || (lastBall.indexOf(WICKET) > -1)) {
             let index = innings[currentInningIndex].batsmen.findIndex((batsman) => batsman.name === batsmanOnStrike);
             if (index > -1) {
                 innings[currentInningIndex].batsmen[index] = {
@@ -310,7 +309,7 @@ function UpdateScore({
                     <Dropdown style={{ width: "100%" }} optionLabel="name" value={batsmanOnNonStrike} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnNonStrike(e.value)} placeholder="Select" />
                 </div>
             )
-        } else if (totalWickets < totalPlayersPerSide - 1 && lastBall.indexOf(WICKET) > -1 && lastBall.indexOf(WIDE) < 0 && batsmenNotOut.length < 2) {
+        } else if (totalWickets < totalPlayersPerSide - 1 && lastBall.indexOf(WICKET) > -1 && batsmenNotOut.length < 2) {
             batsmanBowlerJsx.push(
                 <div className="marg-bottom-10" >
                     {/* Choose Batsman after wicket gone */}
@@ -344,17 +343,24 @@ function UpdateScore({
     return (
         <div>
             <div className="rca-container">
-                <div className="rca-row">
-                    <div className="rca-column-6">
-                        <div className="rca-medium-widget rca-padding rca-top-border">
-                            <CurrentScore></CurrentScore>
-                        </div>
-                    </div>
-                </div>
                 <div className="rca-column-6">
                     <div className="rca-medium-widget rca-padding rca-top-border">
-                        <ChooseBatsmanAndBowler></ChooseBatsmanAndBowler>
-                        <CurrentBallDetails></CurrentBallDetails>
+                        {
+                            (() => {
+                                if (totalOvers < totalOversPerInning) {
+                                    return (<>
+                                        <ChooseBatsmanAndBowler></ChooseBatsmanAndBowler>
+                                        <CurrentBallDetails></CurrentBallDetails>
+                                    </>)
+                                } else {
+                                    return (
+                                        <>
+
+                                        </>
+                                    )
+                                }
+                            })()
+                        }
                     </div>
                 </div >
             </div>
