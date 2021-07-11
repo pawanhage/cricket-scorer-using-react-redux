@@ -6,12 +6,12 @@ import { WicketDetailsContext } from './UpdateScore';
 function SetWhoOut() {
     const { wicketDetails, dispatchWicketDetails, currentBatsmanOptions } = useContext(WicketDetailsContext)
     return (
-        <>
-            <div className="marg-top-right-bottom-10">Who Out (*disable if striker batsman is out)</div>
-            <div>
-                <Dropdown disabled={!wicketDetails.wicketType || [BOWLED, LBW, HIT_WICKET, STUMPED].includes(wicketDetails.wicketType)} optionLabel="name" value={wicketDetails.whoOut} options={currentBatsmanOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_WHO_OUT', payload: e.value })} placeholder="Select" />
+        <div className="marg-right-10">
+            <div className="marg-top-right-bottom-10 equal-width">Who Out</div>
+            <div className="equal-width">
+                <Dropdown disabled={!wicketDetails.wicketType || [BOWLED, LBW, HIT_WICKET, STUMPED, CAUGHT_BY].includes(wicketDetails.wicketType)} optionLabel="name" value={wicketDetails.whoOut} options={currentBatsmanOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_WHO_OUT', payload: e.value })} placeholder="Select" />
             </div>
-        </>
+        </div>
     )
 }
 
@@ -26,46 +26,20 @@ function SetOutByPlayer() {
         outByHeading = 'Stumped By'
     }
     return (
-        <>
-            <div className="marg-top-right-bottom-10">{outByHeading}</div>
-            <div>
+        <div>
+            <div className="marg-top-right-bottom-10 equal-width">{outByHeading}</div>
+            <div className="equal-width">
                 <Dropdown disabled={!wicketDetails.wicketType || [BOWLED, LBW, HIT_WICKET, FIELD_OBSTRUCT].includes(wicketDetails.wicketType)} optionLabel="name" value={wicketDetails.outByPlayer} options={bowlingTeamPlayersOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_OUT_BY_PLAYER', payload: e.value })} placeholder="Select" />
             </div>
-        </>
+        </div>
     )
 }
 
 function WicketDetails() {
-    const { wicketDetails } = useContext(WicketDetailsContext)
     return (
         <>
             <SetWhoOut></SetWhoOut>
             <SetOutByPlayer></SetOutByPlayer>
-
-            {/* {(() => {
-                if (wicketDetails.wicketType === RUN_OUT) {
-                    return (
-                        <>
-                            <SetWhoOut></SetWhoOut>
-                            <SetOutByPlayer outByHeading={'Run Out By'}></SetOutByPlayer>
-                        </>
-                    )
-                } else if (wicketDetails.wicketType === CAUGHT_BY || wicketDetails.wicketType === STUMPED) {
-                    const outByHeading = wicketDetails.wicketType === CAUGHT_BY ? 'Caught By' : 'Stumped By';
-                    return (
-                        <>
-                            <SetOutByPlayer outByHeading={outByHeading}></SetOutByPlayer>
-                        </>
-                    )
-                } else if (wicketDetails.wicketType === FIELD_OBSTRUCT) {
-                    return (
-                        <>
-                            <SetWhoOut></SetWhoOut>
-                        </>
-                    )
-                }
-                return <></>;
-            })()} */}
         </>
     );
 }

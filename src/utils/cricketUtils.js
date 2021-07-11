@@ -17,7 +17,8 @@ import {
     BOWLED,
     LBW,
     HIT_WICKET,
-    OUT
+    OUT,
+    YET_TO_START
 } from "../constants";
 import { isN } from "./common";
 
@@ -50,7 +51,8 @@ export const formInning = (battingTeam, battingTeamPlayers, bowlingTeam, bowling
                 economy: 0
             }
         }),
-        overs: []
+        overs: [],
+        status: YET_TO_START
     };
 }
 
@@ -278,7 +280,7 @@ export const getTotalOvers = (overs) => {
     if (inProgressOverCount > 0) {
         totalOvers = totalOvers + Number('0.' + String(countLegalDeliveriesInOver(overs[overs.length - 1].details)));
     }
-    return totalOvers;
+    return Number(totalOvers);
 }
 
 export const calculateCurrentRunRate = (totalScore, currentOvers) => {

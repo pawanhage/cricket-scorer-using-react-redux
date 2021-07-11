@@ -15,6 +15,8 @@ import {
     getBowlingTeamPlayers,
     getTotalOversCount,
     getTotalOversPerInning,
+    startNextInning,
+    setMatchResult,
 } from '../redux';
 import { Dropdown } from 'primereact/dropdown';
 import {
@@ -22,6 +24,7 @@ import {
     BYES,
     CAUGHT_BY,
     COMPLETE,
+    COMPLETED,
     EXTRAS_OPTIONS,
     FIELD_OBSTRUCT,
     HIT_WICKET,
@@ -38,13 +41,13 @@ import {
     STUMPED,
     WICKET,
     WICKET_OPTIONS,
-    WIDE
+    WIDE,
+    YET_TO_START
 } from '../constants';
 import { Button } from 'primereact/button';
 import { InputNumber } from 'primereact/inputnumber';
-import { getUpdatedInningStats, isContinueButtonDisabledForCurrentBall } from '../utils/cricketUtils';
+import { getTotalOvers, getUpdatedInningStats, isContinueButtonDisabledForCurrentBall } from '../utils/cricketUtils';
 import { cloneDeep } from '../utils/common';
-import CurrentScore from './CurrentScore';
 import WicketDetails from './WicketDetails';
 import { ToggleButton } from 'primereact/togglebutton';
 
@@ -87,7 +90,10 @@ function UpdateScore({
     bowlingTeamPlayers,
     totalOvers,
     totalOversPerInning,
-    updateInnings
+    matchResult,
+    updateInnings,
+    startNextInning,
+    setMatchResult
 }) {
 
     const [batsmanOnStrike, setBatsmanOnStrike] = useState(strikerBatsman ? strikerBatsman.name : null);
@@ -187,8 +193,7 @@ function UpdateScore({
         }
 
         if (wicketDetailsState.wicketType) {
-            ball.push('+');
-            ball.push(WICKET);
+            ball.length ? ball.push('+' + WICKET) : ball.push(WICKET);
         }
         setCurrentBall(ball);
     }, [runs, extra, wicketDetailsState.wicketType])
@@ -224,6 +229,30 @@ function UpdateScore({
             ...innings[currentInningIndex],
             ...getUpdatedInningStats(innings[currentInningIndex], currentBall, strikerBatsman, nonStrikerBatsman, currentBowler, wicketDetailsState)
         }
+
+        const getMatchResult = () => {
+            let matchResult;
+            if (innings[currentInningIndex].target) {
+                if (innings[currentInningIndex].totalScore >= innings[currentInningIndex].target) {
+                    matchResult = `${innings[currentInningIndex].battingTeam} Won By ${innings[currentInningIndex].batsmen.length - 1 - innings[currentInningIndex].totalWickets} Wickets`
+                } else if (innings[currentInningIndex].status === COMPLETED) {
+                    if (innings[currentInningIndex].totalScore === innings[currentInningIndex].target - 1) {
+                        matchResult = 'Match Tied';
+                    } else {
+                        matchResult = `${innings[currentInningIndex].bowlingTeam} Won By ${innings[currentInningIndex].target - innings[currentInningIndex].totalScore - 1} Runs`;
+                    }
+                }
+            }
+            return matchResult;
+        }
+
+        if ((innings[currentInningIndex].totalWickets === innings[currentInningIndex].batsmen.length) || getTotalOvers(innings[currentInningIndex].overs) === totalOversPerInning) {
+            innings[currentInningIndex].status = COMPLETED;
+            if (innings[currentInningIndex + 1]) {
+                innings[currentInningIndex + 1].target = innings[currentInningIndex].totalScore + 1
+            }
+        }
+        setMatchResult(getMatchResult());
         updateInnings(innings);
         resetBall();
     }
@@ -232,21 +261,27 @@ function UpdateScore({
         if (currentBowler && totalWickets < totalPlayersPerSide - 1 && currentOver.status === IN_PROGRESS && !(batsmenNotOut.length < 2)) {
             return (
                 <>
-                    <div className="marg-bottom-10" >
-                        <div>
-                            <div className="marg-top-right-bottom-10">Runs</div>
-                            <div>
+                    <div className="marg-bottom-10" style={{ display: 'inline-flex' }}>
+                        <div className="marg-right-10" >
+                            <div className="marg-top-right-bottom-10 equal-width">Runs</div>
+                            <div className="equal-width">
                                 <Dropdown optionLabel="label" value={runs} options={runsOptions} onChange={(e) => setRuns(e.value)} placeholder="Select" />
                                 <InputNumber disabled={extra === PENALTY_RUNS} className="marg-left-10" value={runs} onValueChange={(e) => setRuns(e.value)} mode="decimal" min={0} max={100} />
                             </div>
-                            <div className="marg-top-right-bottom-10">Extras</div>
-                            <div >
+                        </div>
+                        <div className="marg-right-10" >
+                            <div className="marg-top-right-bottom-10 equal-width">Extras</div>
+                            <div className="equal-width">
                                 <Dropdown optionLabel="label" value={extra} options={extrasOptions} onChange={(e) => setExtra(e.value)} placeholder="Select" />
                             </div>
-                            <div className="marg-top-right-bottom-10">Wicket</div>
-                            <div>
+                        </div>
+                        <div className="marg-right-10" >
+                            <div className="marg-top-right-bottom-10 equal-width">Wicket</div>
+                            <div className="equal-width">
                                 <Dropdown optionLabel="label" value={wicketDetailsState.wicketType} options={wicketOptions} onChange={(e) => dispatchWicketDetails({ type: 'SET_WICKET_TYPE', payload: e.value })} placeholder="Select" />
                             </div>
+                        </div>
+                        <div className="marg-right-10" style={{ display: 'inherit' }} >
                             <WicketDetailsContext.Provider value={{ wicketDetails: wicketDetailsState, dispatchWicketDetails: dispatchWicketDetails, currentBatsmanOptions: currentBatsmanOptions, bowlingTeamPlayersOptions: bowlingTeamPlayersOptions }}>
                                 <WicketDetails></WicketDetails>
                             </WicketDetailsContext.Provider>
@@ -294,6 +329,7 @@ function UpdateScore({
                 });
             }
         }
+        innings[currentInningIndex].status = IN_PROGRESS;
         updateInnings(innings);
     }
 
@@ -301,38 +337,52 @@ function UpdateScore({
         let batsmanBowlerJsx = [];
         if (batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide) {
             batsmanBowlerJsx.push(
-                <div className="marg-bottom-10" >
+                <div className="marg-bottom-10" style={{ display: 'inline-flex' }} >
                     {/* Choose New Batsmen */}
-                    <div className="marg-top-right-bottom-10" >On Strike End</div>
-                    <Dropdown optionLabel="name" value={batsmanOnStrike} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
-                    <div className="marg-top-right-bottom-10" >On Non Strike End</div>
-                    <Dropdown optionLabel="name" value={batsmanOnNonStrike} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnNonStrike(e.value)} placeholder="Select" />
+                    <div className="marg-right-10">
+                        <div className="marg-top-right-bottom-10 equal-width" >On Strike End</div>
+                        <Dropdown className="equal-width" optionLabel="name" value={batsmanOnStrike} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
+                    </div>
+                    <div className="marg-right-10">
+                        <div className="marg-top-right-bottom-10 equal-width" >On Non Strike End</div>
+                        <Dropdown className="equal-width" optionLabel="name" value={batsmanOnNonStrike} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setBatsmanOnNonStrike(e.value)} placeholder="Select" />
+                    </div>
                 </div>
             )
         } else if (totalWickets < totalPlayersPerSide - 1 && lastBall.indexOf(WICKET) > -1 && batsmenNotOut.length < 2) {
             batsmanBowlerJsx.push(
-                <div className="marg-bottom-10" >
+                <div className="marg-bottom-10" style={{ display: 'inline-flex' }}>
                     {/* Choose Batsman after wicket gone */}
-                    <div className="marg-top-right-bottom-10">Current Batsman</div>
-                    <Dropdown optionLabel="name" value={batsmenNotOut[0].name} options={batsmenNotOutOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
-                    <ToggleButton style={{ marginLeft: "10px" }} checked={isCurrentBatsmanOnStrike} onChange={(e) => setCurrentBatsmanOnStrike(e.value)} onLabel="On Strike" offLabel="On Non Strike" onIcon="pi pi-check" offIcon="pi pi-times" />
-                    <div className="marg-top-right-bottom-10">Next Batsman</div>
-                    <Dropdown optionLabel="name" value={nextBatsman} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setNextBatsman(e.value)} placeholder="Select" />
-                    <ToggleButton style={{ marginLeft: "10px" }} checked={!isCurrentBatsmanOnStrike} onChange={(e) => setCurrentBatsmanOnStrike(!e.value)} onIcon="pi pi-check" onLabel="On Strike" offLabel="On Non Strike" offIcon="pi pi-times" />
+                    <div className="marg-right-10" >
+                        <div className="marg-top-right-bottom-10 equal-width">Current Batsman</div>
+                        <div className="equal-width">
+                            <Dropdown optionLabel="name" value={batsmenNotOut[0].name} options={batsmenNotOutOptions} onChange={(e) => setBatsmanOnStrike(e.value)} placeholder="Select" />
+                            <ToggleButton style={{ marginLeft: "10px" }} checked={isCurrentBatsmanOnStrike} onChange={(e) => setCurrentBatsmanOnStrike(e.value)} onLabel="On Strike" offLabel="On Non Strike" onIcon="pi pi-check" offIcon="pi pi-times" />
+                        </div>
+                    </div>
+                    <div className="marg-right-10">
+                        <div className="marg-top-right-bottom-10">Next Batsman</div>
+                        <div className="equal-width">
+                            <Dropdown optionLabel="name" value={nextBatsman} options={batsmenYetToBatOrRetdHurtOptions} onChange={(e) => setNextBatsman(e.value)} placeholder="Select" />
+                            <ToggleButton style={{ marginLeft: "10px" }} checked={!isCurrentBatsmanOnStrike} onChange={(e) => setCurrentBatsmanOnStrike(!e.value)} onIcon="pi pi-check" onLabel="On Strike" offLabel="On Non Strike" offIcon="pi pi-times" />
+                        </div>
+                    </div>
                 </div>
             );
         }
         if ((!currentBowler || currentOver.status === COMPLETE) && totalOvers < totalOversPerInning) {
             batsmanBowlerJsx.push(
-                <div className="marg-bottom-10" >
-                    <div className="marg-top-right-bottom-10">Choose Bowler</div>
-                    <Dropdown optionLabel="name" value={nextBowler} options={nextPossibleBowlersOptions} onChange={(e) => setCurrentBowler(e.value)} placeholder="Select" />
+                <div className="marg-bottom-10" style={{ display: 'inline-flex' }}>
+                    <div className="marg-right-10">
+                        <div className="marg-top-right-bottom-10 equal-width">Choose Bowler</div>
+                        <Dropdown className="equal-width" optionLabel="name" value={nextBowler} options={nextPossibleBowlersOptions} onChange={(e) => setCurrentBowler(e.value)} placeholder="Select" />
+                    </div>
                 </div>
             );
         }
         if (batsmanBowlerJsx.length) {
             batsmanBowlerJsx.push(
-                <div className="display-grid ">
+                <div style={{ textAlign: 'center' }}>
                     <Button type="button" disabled={!batsmanOnStrike || !batsmanOnNonStrike || !nextBowler} label="Continue" onClick={() => continueMatch()} />
                 </div>
             );
@@ -344,18 +394,28 @@ function UpdateScore({
         <div>
             <div className="rca-container">
                 <div className="rca-column-12">
-                    <div className="rca-medium-widget rca-padding rca-top-border">
+                    <div className="rca-medium-widget rca-padding min-ht-unset pad-top-10 rca-top-border">
                         {
                             (() => {
-                                if (totalOvers < totalOversPerInning) {
-                                    return (<>
-                                        <ChooseBatsmanAndBowler></ChooseBatsmanAndBowler>
-                                        <CurrentBallDetails></CurrentBallDetails>
-                                    </>)
-                                } else {
+                                if (totalOvers < totalOversPerInning || innings[currentInningIndex].status === YET_TO_START) {
                                     return (
                                         <>
-
+                                            <ChooseBatsmanAndBowler></ChooseBatsmanAndBowler>
+                                            <CurrentBallDetails></CurrentBallDetails>
+                                        </>
+                                    )
+                                } else if (!matchResult) {
+                                    return (
+                                        <>
+                                            <div style={{ textAlign: 'center' }}>
+                                                <Button type="button" label="Start Next Inning" onClick={() => startNextInning()} />
+                                            </div>
+                                        </>
+                                    )
+                                } else if (matchResult) {
+                                    return (
+                                        <>
+                                            Match Ended
                                         </>
                                     )
                                 }
@@ -384,13 +444,16 @@ const mapStateToProps = (state) => {
         currentOver: getCurrentOver(state.match),
         bowlingTeamPlayers: getBowlingTeamPlayers(state.match),
         totalOvers: getTotalOversCount(state.match),
-        totalOversPerInning: getTotalOversPerInning(state.match)
+        totalOversPerInning: getTotalOversPerInning(state.match),
+        matchResult: state.match.details.result
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        updateInnings: (innings) => dispatch(updateInnings(innings))
+        updateInnings: (innings) => dispatch(updateInnings(innings)),
+        startNextInning: () => dispatch(startNextInning()),
+        setMatchResult: (matchResult) => dispatch(setMatchResult(matchResult))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(UpdateScore);

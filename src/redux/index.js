@@ -1,5 +1,5 @@
 import { IN_PROGRESS, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RETD_HURT, YET_TO_BAT } from "../constants";
-import { calculateCurrentRunRate, getTotalOvers } from "../utils/cricketUtils";
+import { calculateCurrentRunRate, calculateRequiredRunRate, getTotalOvers } from "../utils/cricketUtils";
 
 export const INSERT_MATCH_DETALS = 'INSERT_MATCH_DETAILS';
 export const UPDATE_INNINGS = 'UPDATE_INNINGS';
@@ -7,6 +7,8 @@ export const FORCE_END_OVER = 'FORCE_END_OVER';
 export const END_BALL = 'END_BALL';
 export const END_INNING = 'END_INNING';
 export const RESET_LAST_BALL = 'RESET_LAST_BALL';
+export const START_NEXT_INNING = 'START_NEXT_INNING';
+export const SET_MATCH_RESULT = 'SET_MATCH_RESULT';
 
 export const getYetToBatOrRetdHurtBatsmen = (match) => {
     return match.innings[match.currentInningIndex].batsmen.filter((batsman) => batsman.status === YET_TO_BAT || batsman.status === RETD_HURT);
@@ -96,6 +98,10 @@ export const getCurrentRunRate = (match) => {
     return calculateCurrentRunRate(match.innings[match.currentInningIndex].totalScore, match.innings[match.currentInningIndex].overs);
 }
 
+export const getRequiredRunRate = (match) => {
+    return calculateRequiredRunRate(match.innings[match.currentInningIndex].totalScore, match.innings[match.currentInningIndex].target, match.innings[match.currentInningIndex].overs, match.details.totalOversPerInning);
+}
+
 export const getTotalOversPerInning = (match) => {
     return match.details.totalOversPerInning;
 }
@@ -131,12 +137,29 @@ export const updateInnings = (innings) => {
     };
 }
 
+export const startNextInning = () => {
+    return {
+        type: START_NEXT_INNING
+    }
+}
+
+export const setMatchResult = (matchResult) => {
+    return {
+        type: SET_MATCH_RESULT,
+        payload: matchResult
+    }
+}
+
 export const matchReducer = (state = initialState, action) => {
     switch (action.type) {
         case INSERT_MATCH_DETALS:
             return { ...state, details: action.payload };
         case UPDATE_INNINGS:
             return { ...state, innings: action.payload };
+        case START_NEXT_INNING:
+            return { ...state, currentInningIndex: state.currentInningIndex + 1 };
+        case SET_MATCH_RESULT:
+            return { ...state, details: { ...state.details, result: action.payload } };
         case FORCE_END_OVER:
             return { ...state, innings: action.payload };
         case END_BALL:

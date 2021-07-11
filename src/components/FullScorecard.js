@@ -1,5 +1,4 @@
 import React from 'react'
-import CurrentScore from './CurrentScore'
 
 function FullScorecard() {
     return (

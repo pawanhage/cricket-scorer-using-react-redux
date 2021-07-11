@@ -55,3 +55,6 @@ export const WICKET_OPTIONS = [
     { label: "Hit Wicket", value: HIT_WICKET, disabled: false },
     { label: "Field Obstruct", value: FIELD_OBSTRUCT, disabled: false }
 ];
+
+export const YET_TO_START = 'YTS';
+export const COMPLETED = 'COMPLETED';

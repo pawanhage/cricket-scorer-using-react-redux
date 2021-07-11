@@ -144,3 +144,16 @@
 .p-sidebar-right {
     width: auto !important;
 }
+
+.equal-width {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.pad-top-10 {
+    padding-top: 10px !important;
+}
+
+.min-ht-unset {
+    min-height: unset !important;
+}
