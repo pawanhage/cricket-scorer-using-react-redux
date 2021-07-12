@@ -193,7 +193,10 @@ function UpdateScore({
         }
 
         if (wicketDetailsState.wicketType) {
-            ball.length ? ball.push('+' + WICKET) : ball.push(WICKET);
+            if (ball.length) {
+                ball.push('+');
+            }
+            ball.push(WICKET);
         }
         setCurrentBall(ball);
     }, [runs, extra, wicketDetailsState.wicketType])

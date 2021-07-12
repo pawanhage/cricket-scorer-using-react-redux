@@ -1,50 +1,33 @@
 import React from 'react'
+import { TabView, TabPanel } from 'primereact/tabview';
+import InningDetails from './InningDetails';
+import { connect } from 'react-redux';
 
-function FullScorecard() {
+function FullScorecard({ innings }) {
     return (
-        <div>
-            <div className="rca-container">
-                <div class="rca-row">
-                    <div class="rca-column-12">
-                        <div class="rca-menu-scroll">
-                            <ul class="rca-season-list">
-                                <li>
-                                    <a href="/widgets.html">
-                                        BAN vs ZIM
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        IND vs AUS
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/widgets.html">
-                                        WI vs IND
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/widgets.html">
-                                        RSA vs NZ
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/widgets.html">
-                                        ENG vs BAN
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/widgets.html">
-                                        AUS vs ZIM
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <>
+            <TabView style={{ fontFamily: "Lato, Verdana, Helvetica, sans-serif" }}>
+                {
+                    (() => {
+                        let inningsJsx = innings.map((inning, index) => {
+                            return (
+                                <TabPanel header={"Inning " + (index + 1)}>
+                                    <InningDetails inning={inning}></InningDetails>
+                                </TabPanel>
+                            )
+                        });
+                        return inningsJsx;
+                    })()
+                }
+            </TabView>
+        </>
     )
 }
 
-export default FullScorecard
+const mapStateToProps = (state) => {
+    return {
+        innings: state.match.innings
+    }
+}
+
+export default connect(mapStateToProps, null)(FullScorecard)

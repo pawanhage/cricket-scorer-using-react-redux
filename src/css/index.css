@@ -315,6 +315,14 @@ button {
     padding-right: 0px;
 }
 
+.rca-no-top-padding {
+    padding-top: 0px !important;
+}
+
+.rca-no-bottom-padding {
+    padding-bottom: 0px !important;
+}
+
 .rca-no-left-padding {
     padding-left: 0px;
 }
@@ -768,7 +776,7 @@ button {
 }
 .rca-batting-score .rca-col.rca-player,
 .rca-bowling-score .rca-col.rca-player {
-    width: 40%;
+    width: 25%;
 }
 
 .rca-border-bottom {
@@ -897,7 +905,7 @@ button {
     line-height: 20px;
 }
 .rca-player-detail .rca-player {
-    min-width: 150px;
+    min-width: 100px;
 }
 
 .rca-wicket-falls {
