@@ -3,15 +3,15 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import InningDetails from './InningDetails';
 import { connect } from 'react-redux';
 
-function FullScorecard({ innings }) {
+function FullScorecard({ innings, currentInningIndex }) {
     return (
         <>
-            <TabView style={{ fontFamily: "Lato, Verdana, Helvetica, sans-serif" }}>
+            <TabView activeIndex={currentInningIndex} style={{ fontFamily: "Lato, Verdana, Helvetica, sans-serif" }}>
                 {
                     (() => {
                         let inningsJsx = innings.map((inning, index) => {
                             return (
-                                <TabPanel header={"Inning " + (index + 1)}>
+                                <TabPanel key={index} header={"Inning " + (index + 1)}>
                                     <InningDetails inning={inning}></InningDetails>
                                 </TabPanel>
                             )
@@ -26,7 +26,8 @@ function FullScorecard({ innings }) {
 
 const mapStateToProps = (state) => {
     return {
-        innings: state.match.innings
+        innings: state.match.innings,
+        currentInningIndex: state.match.currentInningIndex
     }
 }
 

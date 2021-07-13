@@ -26,7 +26,13 @@ export const formInning = (battingTeam, battingTeamPlayers, bowlingTeam, bowling
     return {
         totalScore: 0,
         totalWickets: 0,
-        extras: 0,
+        extras: {
+            wides: 0,
+            noBalls: 0,
+            legByes: 0,
+            byes: 0,
+            penaltyRuns: 0
+        },
         battingTeam: battingTeam,
         bowlingTeam: bowlingTeam,
         batsmen: battingTeamPlayers.map((player) => {

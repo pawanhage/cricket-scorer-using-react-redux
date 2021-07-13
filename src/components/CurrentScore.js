@@ -25,8 +25,8 @@ function CurrentScore({
                 <div class="rca-column-3 rca-no-right-padding">
                     <div class="rca-menu-widget rca-left-border">
                         <div class="rca-padding">
-                            <span class="rca-match-title">{currentInning.battingTeam}</span>
-                            <span class="rca-match-score">{currentInning.totalScore}/{currentInning.totalWickets} Overs {totalOvers}</span>
+                            <span class="rca-match-title">{currentInning.battingTeam}:</span>
+                            <span class="rca-match-score">{currentInning.totalScore}/{currentInning.totalWickets} Overs: {totalOvers}</span>
                             <span>CRR: {currentRunRate} </span>
                             {
                                 (() => {
@@ -87,7 +87,7 @@ function CurrentScore({
                                         if (currentBowler) {
                                             return (
                                                 <div className="rca-bowler-info" style={{ display: 'inline', marginRight: '5px' }}>
-                                                    <span>{currentBowler.name}: </span><span className="rca-bolwing">{currentBowler.runsGiven}/{currentBowler.wicketsTaken} in {currentBowler.totalOvers}</span>
+                                                    <span>{currentBowler.name}: </span><span className="rca-bolwing">{currentBowler.runsGiven}-{currentBowler.wicketsTaken} in {currentBowler.totalOvers}</span>
                                                 </div>
                                             )
                                         }
@@ -134,7 +134,7 @@ function CurrentScore({
                                 (() => {
                                     if (currentInningIndex === 0) {
                                         const whoWon = Number(String(tossResult).split('')[2]);
-                                        const decision = Number(String(tossResult).split('')[0]) === 1 ? "bat" : "bowl";
+                                        const decision = Number(String(tossResult).split('')[0]) === whoWon ? "bat" : "bowl";
                                         return (
                                             <>
                                                 <span style={{ fontWeight: 'bold' }} className="rca-center">
@@ -195,7 +195,7 @@ function CurrentScore({
                                 })()
                             }
                             <span style={{ fontWeight: 'bold' }}>{currentInning.battingTeam} - {currentInning.totalScore}/{currentInning.totalWickets}, </span>
-                            <span style={{ fontWeight: 'bold' }}>{currentInning.bowlingTeam} Requires {currentInning.totalScore + 1} in {totalOvers} Overs at Rate {Number(((currentInning.totalScore + 1) / totalOversPerInning).toFixed(2))} Runs Per Over</span>
+                            <span style={{ fontWeight: 'bold' }}>{currentInning.bowlingTeam} Requires {currentInning.totalScore + 1} Runs in {totalOversPerInning} Overs at Rate {Number(((currentInning.totalScore + 1) / totalOversPerInning).toFixed(2))} Runs Per Over</span>
                         </div>
                     </div>
                 </div>

@@ -1,14 +1,14 @@
 import React from 'react'
-import { BOWLED, CAUGHT_BY, FIELD_OBSTRUCT, HIT_WICKET, LBW, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RUN_OUT, YET_TO_BAT, YET_TO_START } from '../constants'
+import { BOWLED, CAUGHT_BY, FIELD_OBSTRUCT, HIT_WICKET, LBW, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RUN_OUT, STUMPED, YET_TO_BAT, YET_TO_START } from '../constants'
 import { getTotalOvers } from '../utils/cricketUtils'
 
 function InningDetails({ inning }) {
     if (inning.status !== YET_TO_START) {
         return (
             <>
-                <div id="tab-41" class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
+                <div class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
                     <div class="rca-batting-score rca-padding ">
-                        <h3>{inning.battingTeam} Batting: <strong> {inning.totalScore}/{inning.totalWickets} in {getTotalOvers(inning.overs)}</strong></h3>
+                        <h3>{inning.battingTeam} Batting: <strong> {inning.totalScore}/{inning.totalWickets} in {getTotalOvers(inning.overs)} Overs</strong></h3>
                         <div class="rca-row">
                             <div class="rca-header rca-table">
                                 <div class="rca-col rca-player">
@@ -31,14 +31,14 @@ function InningDetails({ inning }) {
                             </div>
                         </div>
                         {(() => {
-                            let batsmenJsx = inning.batsmen.filter((batsman) => batsman.status !== YET_TO_BAT).sort((a, b) => a.order - b.order).map((batsman) => {
+                            let batsmenJsx = inning.batsmen.filter((batsman) => batsman.status !== YET_TO_BAT).sort((a, b) => a.order - b.order).map((batsman, index) => {
                                 let wicketDetails;
                                 let status;
                                 if (batsman.wicketDetails) {
                                     if (batsman.wicketDetails.type === BOWLED || batsman.wicketDetails.type === LBW) {
                                         wicketDetails = `${batsman.wicketDetails.type} ${batsman.wicketDetails.bowler}`
                                     }
-                                    if (batsman.wicketDetails.type === RUN_OUT || batsman.wicketDetails.type === CAUGHT_BY) {
+                                    if (batsman.wicketDetails.type === RUN_OUT || batsman.wicketDetails.type === CAUGHT_BY || batsman.wicketDetails.type === STUMPED) {
                                         wicketDetails = `${batsman.wicketDetails.type} ${batsman.wicketDetails.outBy}`
                                     }
                                     if (batsman.wicketDetails.type === HIT_WICKET || batsman.wicketDetails.type === FIELD_OBSTRUCT) {
@@ -50,7 +50,7 @@ function InningDetails({ inning }) {
                                     }
                                 }
                                 return (
-                                    <div class="rca-row">
+                                    <div key={index} class="rca-row">
                                         <div class="rca-table">
                                             <div class="rca-col rca-player">
                                                 {batsman.name}
@@ -88,7 +88,7 @@ function InningDetails({ inning }) {
                         <div class="rca-row">
                             <div class="rca-header rca-table">
                                 <div class="rca-col rca-player">
-                                    Bowler
+                                    Bowlers
                                 </div>
                                 <div class="rca-col">
                                     Overs
@@ -109,9 +109,9 @@ function InningDetails({ inning }) {
                         </div>
                         {
                             (() => {
-                                let bowlerJsx = inning.bowlers.filter((bowler) => bowler.totalOvers > 0).map((bowler) => {
+                                let bowlerJsx = inning.bowlers.filter((bowler) => bowler.totalOvers > 0).map((bowler, index) => {
                                     return (
-                                        <div class="rca-row">
+                                        <div key={bowler.index} class="rca-row">
                                             <div class="rca-table">
                                                 <div class="rca-col rca-player">
                                                     {bowler.name}
@@ -144,7 +144,7 @@ function InningDetails({ inning }) {
             </>
         )
     } else {
-        return <>Inning Not Started Yet</>
+        return <div style={{fontSize: '40px', padding: '85px', textAlign: 'center'}}>Inning Yet To Start</div>
     }
 }
 

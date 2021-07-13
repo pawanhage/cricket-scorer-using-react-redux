@@ -48,11 +48,18 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
             totalPlayersPerSide: firstTeamPlayers.length
         });
         let innings = [];
-        let battingTeam = String(tossResult).includes('12') ? firstTeamName : secondTeamName;
-        let battingTeamPlayers = String(tossResult).includes('12') ? firstTeamPlayers : secondTeamPlayers;
-        let bowlingTeam = String(tossResult).includes('12') ? secondTeamName : firstTeamName;
-        let bowlingTeamPlayers = String(tossResult).includes('12') ? secondTeamPlayers : firstTeamPlayers;
-
+        let battingTeam, battingTeamPlayers, bowlingTeam, bowlingTeamPlayers;
+        if (tossResult === 121 || tossResult === 122) {
+            battingTeam = firstTeamName;
+            battingTeamPlayers = firstTeamPlayers;
+            bowlingTeam = secondTeamName;
+            bowlingTeamPlayers = secondTeamPlayers;
+        } else {
+            battingTeam = secondTeamName;
+            battingTeamPlayers = secondTeamPlayers;
+            bowlingTeam = firstTeamName;
+            bowlingTeamPlayers = firstTeamPlayers;
+        }
         innings.push(formInning(battingTeam, battingTeamPlayers, bowlingTeam, bowlingTeamPlayers));
         if (matchType === ONE_DAY_MATCH) {
             innings.push(formInning(bowlingTeam, bowlingTeamPlayers, battingTeam, battingTeamPlayers));

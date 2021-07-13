@@ -99,7 +99,14 @@ function UpdateScore({
     const [batsmanOnStrike, setBatsmanOnStrike] = useState(strikerBatsman ? strikerBatsman.name : null);
     const [batsmanOnNonStrike, setBatsmanOnNonStrike] = useState(nonStrikerBatsman ? nonStrikerBatsman.name : null);
 
-    const [nextBowler, setCurrentBowler] = useState(null);
+    const [nextBowler, setNextBowler] = useState(null);
+
+    useEffect(() => {
+        if (!currentBowler) {
+            setNextBowler(null);
+        }
+    }, [currentBowler]);
+
     const [nextBatsman, setNextBatsman] = useState(null);
     const [isCurrentBatsmanOnStrike, setCurrentBatsmanOnStrike] = useState(true);
 
@@ -194,9 +201,14 @@ function UpdateScore({
 
         if (wicketDetailsState.wicketType) {
             if (ball.length) {
-                ball.push('+');
+                if (!(runs === 0 && ball.length === 1)) {
+                    ball.push('+');
+                }
             }
             ball.push(WICKET);
+            if (runs === 0) {
+                ball.splice(0, 1);
+            }
         }
         setCurrentBall(ball);
     }, [runs, extra, wicketDetailsState.wicketType])
@@ -238,6 +250,7 @@ function UpdateScore({
             if (innings[currentInningIndex].target) {
                 if (innings[currentInningIndex].totalScore >= innings[currentInningIndex].target) {
                     matchResult = `${innings[currentInningIndex].battingTeam} Won By ${innings[currentInningIndex].batsmen.length - 1 - innings[currentInningIndex].totalWickets} Wickets`
+                    innings[currentInningIndex].status = COMPLETED;
                 } else if (innings[currentInningIndex].status === COMPLETED) {
                     if (innings[currentInningIndex].totalScore === innings[currentInningIndex].target - 1) {
                         matchResult = 'Match Tied';
@@ -249,7 +262,7 @@ function UpdateScore({
             return matchResult;
         }
 
-        if ((innings[currentInningIndex].totalWickets === innings[currentInningIndex].batsmen.length) || getTotalOvers(innings[currentInningIndex].overs) === totalOversPerInning) {
+        if ((innings[currentInningIndex].totalWickets === innings[currentInningIndex].batsmen.length - 1) || getTotalOvers(innings[currentInningIndex].overs) === totalOversPerInning) {
             innings[currentInningIndex].status = COMPLETED;
             if (innings[currentInningIndex + 1]) {
                 innings[currentInningIndex + 1].target = innings[currentInningIndex].totalScore + 1
@@ -378,7 +391,7 @@ function UpdateScore({
                 <div className="marg-bottom-10" style={{ display: 'inline-flex' }}>
                     <div className="marg-right-10">
                         <div className="marg-top-right-bottom-10 equal-width">Choose Bowler</div>
-                        <Dropdown className="equal-width" optionLabel="name" value={nextBowler} options={nextPossibleBowlersOptions} onChange={(e) => setCurrentBowler(e.value)} placeholder="Select" />
+                        <Dropdown className="equal-width" optionLabel="name" value={nextBowler} options={nextPossibleBowlersOptions} onChange={(e) => setNextBowler(e.value)} placeholder="Select" />
                     </div>
                 </div>
             );
@@ -400,7 +413,13 @@ function UpdateScore({
                     <div className="rca-medium-widget rca-padding min-ht-unset pad-top-10 rca-top-border">
                         {
                             (() => {
-                                if (totalOvers < totalOversPerInning || innings[currentInningIndex].status === YET_TO_START) {
+                                if (matchResult) {
+                                    return (
+                                        <div style={{fontSize: '30px', padding: '10px', textAlign: 'center'}}>
+                                            Match Ended
+                                        </div>
+                                    )
+                                } else if (((totalOvers < totalOversPerInning) || innings[currentInningIndex].status === YET_TO_START) && (totalWickets !== totalPlayersPerSide - 1)) {
                                     return (
                                         <>
                                             <ChooseBatsmanAndBowler></ChooseBatsmanAndBowler>
@@ -413,12 +432,6 @@ function UpdateScore({
                                             <div style={{ textAlign: 'center' }}>
                                                 <Button type="button" label="Start Next Inning" onClick={() => startNextInning()} />
                                             </div>
-                                        </>
-                                    )
-                                } else if (matchResult) {
-                                    return (
-                                        <>
-                                            Match Ended
                                         </>
                                     )
                                 }

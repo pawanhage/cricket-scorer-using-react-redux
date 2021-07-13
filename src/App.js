@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import './App.scss';
 import FullScorecard from './components/FullScorecard';
 import MatchDetails from './components/MatchDetails';
@@ -8,9 +8,7 @@ import { getLiveScore } from './redux';
 import CurrentScore from './components/CurrentScore';
 import UpdateScore from './components/UpdateScore';
 
-
-function App({ liveScore }) {
-
+function App({ liveScore}) {
     return (
         <div>
             <div className="rca-container">
