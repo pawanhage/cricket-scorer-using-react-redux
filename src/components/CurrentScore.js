@@ -51,7 +51,7 @@ function CurrentScore({
                                                         return (
                                                             <div className="rca-batsman" style={{ display: 'inline', marginRight: '5px' }}>
                                                                 <span className="player">{strikerBatsman.name}</span>
-                                                                <span>*{strikerBatsman.runsScored}({strikerBatsman.ballsFaced})</span>
+                                                                <span><span style={{ color: '#2196F3' }}>*</span>{strikerBatsman.runsScored}({strikerBatsman.ballsFaced})</span>
                                                             </div>
                                                         )
                                                     }

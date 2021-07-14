@@ -12,7 +12,9 @@ function FullScorecard({ innings, currentInningIndex }) {
                         let inningsJsx = innings.map((inning, index) => {
                             return (
                                 <TabPanel key={index} header={"Inning " + (index + 1)}>
-                                    <InningDetails inning={inning}></InningDetails>
+                                    <div style={{ maxHeight: '370px' }}>
+                                        <InningDetails inning={inning}></InningDetails>
+                                    </div>
                                 </TabPanel>
                             )
                         });

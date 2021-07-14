@@ -99,7 +99,7 @@ function UpdateScore({
     const [batsmanOnStrike, setBatsmanOnStrike] = useState(strikerBatsman ? strikerBatsman.name : null);
     const [batsmanOnNonStrike, setBatsmanOnNonStrike] = useState(nonStrikerBatsman ? nonStrikerBatsman.name : null);
 
-    const [nextBowler, setNextBowler] = useState(null);
+    const [nextBowler, setNextBowler] = useState(currentBowler);
 
     useEffect(() => {
         if (!currentBowler) {
@@ -353,7 +353,7 @@ function UpdateScore({
         let batsmanBowlerJsx = [];
         if (batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide) {
             batsmanBowlerJsx.push(
-                <div className="marg-bottom-10" style={{ display: 'inline-flex' }} >
+                <div key={batsmanBowlerJsx.length} className="marg-bottom-10" style={{ display: 'inline-flex' }} >
                     {/* Choose New Batsmen */}
                     <div className="marg-right-10">
                         <div className="marg-top-right-bottom-10 equal-width" >On Strike End</div>
@@ -367,7 +367,7 @@ function UpdateScore({
             )
         } else if (totalWickets < totalPlayersPerSide - 1 && lastBall.indexOf(WICKET) > -1 && batsmenNotOut.length < 2) {
             batsmanBowlerJsx.push(
-                <div className="marg-bottom-10" style={{ display: 'inline-flex' }}>
+                <div key={batsmanBowlerJsx.length} className="marg-bottom-10" style={{ display: 'inline-flex' }}>
                     {/* Choose Batsman after wicket gone */}
                     <div className="marg-right-10" >
                         <div className="marg-top-right-bottom-10 equal-width">Current Batsman</div>
@@ -388,7 +388,7 @@ function UpdateScore({
         }
         if ((!currentBowler || currentOver.status === COMPLETE) && totalOvers < totalOversPerInning) {
             batsmanBowlerJsx.push(
-                <div className="marg-bottom-10" style={{ display: 'inline-flex' }}>
+                <div key={batsmanBowlerJsx.length} className="marg-bottom-10" style={{ display: 'inline-flex' }}>
                     <div className="marg-right-10">
                         <div className="marg-top-right-bottom-10 equal-width">Choose Bowler</div>
                         <Dropdown className="equal-width" optionLabel="name" value={nextBowler} options={nextPossibleBowlersOptions} onChange={(e) => setNextBowler(e.value)} placeholder="Select" />
@@ -398,7 +398,7 @@ function UpdateScore({
         }
         if (batsmanBowlerJsx.length) {
             batsmanBowlerJsx.push(
-                <div style={{ textAlign: 'center' }}>
+                <div key={batsmanBowlerJsx.length} style={{ textAlign: 'center' }}>
                     <Button type="button" disabled={!batsmanOnStrike || !batsmanOnNonStrike || !nextBowler} label="Continue" onClick={() => continueMatch()} />
                 </div>
             );
@@ -415,7 +415,7 @@ function UpdateScore({
                             (() => {
                                 if (matchResult) {
                                     return (
-                                        <div style={{fontSize: '30px', padding: '10px', textAlign: 'center'}}>
+                                        <div style={{ fontSize: '30px', padding: '10px', textAlign: 'center' }}>
                                             Match Ended
                                         </div>
                                     )

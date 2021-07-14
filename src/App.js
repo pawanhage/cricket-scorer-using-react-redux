@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './App.scss';
 import FullScorecard from './components/FullScorecard';
 import MatchDetails from './components/MatchDetails';
@@ -7,8 +7,12 @@ import { connect } from 'react-redux';
 import { getLiveScore } from './redux';
 import CurrentScore from './components/CurrentScore';
 import UpdateScore from './components/UpdateScore';
+import { Sidebar } from 'primereact/sidebar';
+import { Button } from 'primereact/button';
 
-function App({ liveScore}) {
+function App({ liveScore }) {
+    const [visibleBottom, setVisibleBottom] = useState(false);
+
     return (
         <div>
             <div className="rca-container">
@@ -52,7 +56,12 @@ function App({ liveScore}) {
                             return (
                                 <>
                                     <CurrentScore></CurrentScore>
-                                    <UpdateScore></UpdateScore>
+                                    <div style={{ position: 'fixed', top: '90.7%', right: '2%' }}>
+                                        <Button icon="pi pi-pencil" title="Update Inning" onClick={() => setVisibleBottom(true)} className="p-mr-2"></Button>
+                                    </div>
+                                    <Sidebar visible={visibleBottom} position="bottom" onHide={() => setVisibleBottom(false)}>
+                                        <UpdateScore></UpdateScore>
+                                    </Sidebar>
                                 </>
                             )
                         }
