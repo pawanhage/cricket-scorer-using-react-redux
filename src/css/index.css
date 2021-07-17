@@ -183,7 +183,7 @@ button {
     min-width: 300px;
     max-width: 100%;
     background-color: #fff;
-    margin: 10px 0px;
+    /* margin: 10px 0px; */
 }
 
 .rca-menu-scroll {

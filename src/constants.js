@@ -58,3 +58,37 @@ export const WICKET_OPTIONS = [
 
 export const YET_TO_START = 'YTS';
 export const COMPLETED = 'COMPLETED';
+
+export const MOCK_TEAM_1 = {
+    name: 'MI',
+    players: [
+        'Quinton de Kock',
+        'Rohit Sharma',
+        'Suryakumar Yadav',
+        'Ishan Kishan',
+        'Kieron Pollard',
+        'Hardik Pandya',
+        'Krunal Pandya',
+        'Jayant Yadav',
+        'Rahul Chahar',
+        'Jasprit Bumrah',
+        'Trent Boult'
+    ]
+}
+
+export const MOCK_TEAM_2 = {
+    name: 'CSK',
+    players: [
+        'Ruturaj Gaikwad',
+        'Faf du Plessis',
+        'Suresh Raina',
+        'Moeen Ali',
+        'Ambati Rayudu',
+        'Ravindra Jadeja',
+        'MS Dhoni',
+        'Sam Curran',
+        'Lungi Ngidi',
+        'Deepak Chahar',
+        'Shardul Thakur'
+    ]
+}

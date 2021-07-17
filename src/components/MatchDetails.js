@@ -6,17 +6,17 @@ import { Dropdown } from 'primereact/dropdown';
 import { insertMatchDetails, updateInnings } from '../redux';
 import { connect } from 'react-redux';
 import { useHistory } from "react-router-dom";
-import { ONE_DAY_MATCH, TEST_MATCH } from '../constants';
+import { MOCK_TEAM_1, MOCK_TEAM_2, ONE_DAY_MATCH, TEST_MATCH } from '../constants';
 import { formInning } from '../utils/cricketUtils';
 
 function MatchDetails({ insertMatchDetails, updateInnings }) {
 
-    const [firstTeamName, setFirstTeamName] = useState('MI');
-    const [secondTeamName, setSecondTeamName] = useState('CSK');
+    const [firstTeamName, setFirstTeamName] = useState(MOCK_TEAM_1.name);
+    const [secondTeamName, setSecondTeamName] = useState(MOCK_TEAM_2.name);
     const [matchType, setMatchType] = useState(ONE_DAY_MATCH);
     const [totalOversPerInning, setTotalOvers] = useState(5);
-    const [firstTeamPlayers, setFirstTeamPlayers] = useState(['Rohit', 'Pandya', 'Pollard', 'SKY', 'Boult']);
-    const [secondTeamPlayers, setSecondTeamPlayers] = useState(['MSD', 'Faf', 'Jadeja', 'Raina', 'Sam']);
+    const [firstTeamPlayers, setFirstTeamPlayers] = useState(MOCK_TEAM_1.players);
+    const [secondTeamPlayers, setSecondTeamPlayers] = useState(MOCK_TEAM_2.players);
     const [tossResult, setTossResult] = useState(121);
     const [maxOversPerBowler, setMaxOversPerBowler] = useState(1);
 
@@ -97,11 +97,11 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
                 </div>
             </div>
             <div className="card p-fluid">
-                <h4>Add {firstTeamName} Team Players</h4>
+                <h4>Add {firstTeamName || '1st'} Team Players</h4>
                 <Chips value={firstTeamPlayers} max={11} onChange={(e) => setFirstTeamPlayers(e.value)} />
             </div>
             <div className="card p-fluid">
-                <h4>Add {secondTeamName} Team Players</h4>
+                <h4>Add {secondTeamName || '2nd'} Team Players</h4>
                 <Chips value={secondTeamPlayers} max={11} onChange={(e) => setSecondTeamPlayers(e.value)} />
             </div>
             <div className="p-fluid">

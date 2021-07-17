@@ -62,13 +62,6 @@ export const formInning = (battingTeam, battingTeamPlayers, bowlingTeam, bowling
     };
 }
 
-export const getUpdatedBatsmanOrder = (batsman, order) => {
-    return {
-        ...batsman,
-        order: order
-    }
-}
-
 export const getUpdatedBatsmanStatus = (batsman, status) => {
     return {
         ...batsman,
@@ -247,11 +240,13 @@ export const getExtrasFromCurrentBall = (currentBall) => {
         penaltyRuns: 0
     };
     const index = getExtraBallIndex(currentBall);
+    const totalRunsFromCurrentBall = getRunsFromCurrentBall(currentBall);
+
     if (index > -1) {
         if (currentBall[index] === WIDE) {
             extras = {
                 ...extras,
-                wides: getRunsFromCurrentBall(currentBall)
+                wides: totalRunsFromCurrentBall
             }
         } else if (currentBall[index] === NO_BALL || currentBall[index] === NO_BALL_OFF_BAT) {
             extras = {
@@ -261,17 +256,17 @@ export const getExtrasFromCurrentBall = (currentBall) => {
         } else if (currentBall[index] === LEG_BYES) {
             extras = {
                 ...extras,
-                legByes: getRunsFromCurrentBall(currentBall)
+                legByes: totalRunsFromCurrentBall
             }
         } else if (currentBall[index] === BYES) {
             extras = {
                 ...extras,
-                byes: getRunsFromCurrentBall(currentBall)
+                byes: totalRunsFromCurrentBall
             }
         } else if (currentBall[index] === PENALTY_RUNS) {
             extras = {
                 ...extras,
-                penaltyRuns: getRunsFromCurrentBall(currentBall)
+                penaltyRuns: totalRunsFromCurrentBall
             }
         }
     }
@@ -344,30 +339,21 @@ export const calculateEconomyRateForBowler = (bowler) => {
 
 export const getUpdatedInningStats = (currentInning, currentBall, striker, nonStriker, bowler, wicketDetails) => {
 
+    const totalRunsFromCurrentBall = getRunsFromCurrentBall(currentBall);
+    const extraBallIndex = getExtraBallIndex(currentBall);
+    const strikerIndex = currentInning.batsmen.findIndex((batsman) => batsman.name === striker.name);
+    const nonStrikerIndex = currentInning.batsmen.findIndex((batsman) => batsman.name === nonStriker.name);
+    const whoOutIndex = currentInning.batsmen.findIndex((batsman) => batsman.name === wicketDetails.whoOut);
+
     // handleOvers
     currentInning.overs[currentInning.overs.length - 1] = {
         ...currentInning.overs[currentInning.overs.length - 1],
         details: [...currentInning.overs[currentInning.overs.length - 1].details, currentBall.join('')],
-        totalRunsInThisOver: currentInning.overs[currentInning.overs.length - 1].totalRunsInThisOver + getRunsFromCurrentBall(currentBall)
+        totalRunsInThisOver: currentInning.overs[currentInning.overs.length - 1].totalRunsInThisOver + totalRunsFromCurrentBall
     }
 
-    // // handleTotalOvers
-    // currentInning = {
-    //     ...currentInning,
-    //     totalOvers: [...currentInning.overs[currentInning.overs.length - 1].details, currentBall.join('')],
-    // }
-
-    // handleTotalWickets
-    if (isWicketBall(currentBall)) {
-        currentInning = {
-            ...currentInning,
-            totalWickets: currentInning.totalWickets + 1
-        }
-    }
-
-    // const handleExtras
-    let index = getExtraBallIndex(currentBall);
-    if (index > -1) {
+    // handleExtras
+    if (extraBallIndex > -1) {
         let ext = getExtrasFromCurrentBall(currentBall);
         currentInning = {
             ...currentInning,
@@ -385,28 +371,57 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
     // handleTotalScore
     currentInning = {
         ...currentInning,
-        totalScore: currentInning.totalScore + getRunsFromCurrentBall(currentBall)
+        totalScore: currentInning.totalScore + totalRunsFromCurrentBall
     }
 
     // handleStrikerBatsmanDetails 
-    index = currentInning.batsmen.findIndex((batsman) => batsman.name === striker.name);
-    if (index > -1) {
-        currentInning.batsmen[index] = {
-            ...currentInning.batsmen[index],
-            ...getUpdatedBatsmanStats(currentInning.batsmen[index], currentBall)
+    if (strikerIndex > -1) {
+        currentInning.batsmen[strikerIndex] = {
+            ...currentInning.batsmen[strikerIndex],
+            ...getUpdatedBatsmanStats(currentInning.batsmen[strikerIndex], currentBall)
         }
     }
 
     // handleNonStrikerBatsmanDetails 
-    index = getRunsIndex(currentBall);
-    if (currentBall[getExtraBallIndex(currentBall)] !== PENALTY_RUNS && (isN(currentBall[index]) && currentBall[index] > 0 && currentBall[index] % 2 !== 0)) {
-        index = currentInning.batsmen.findIndex((batsman) => batsman.name === nonStriker.name);
-        if (index > -1) {
-            currentInning.batsmen[index] = {
-                ...currentInning.batsmen[index],
+    let index = getRunsIndex(currentBall);
+    if (currentBall[extraBallIndex] !== PENALTY_RUNS && (isN(currentBall[index]) && currentBall[index] > 0 && currentBall[index] % 2 !== 0)) {
+        if (nonStrikerIndex > -1) {
+            currentInning.batsmen[nonStrikerIndex] = {
+                ...currentInning.batsmen[nonStrikerIndex],
                 status: NOT_OUT_ON_STRIKE
             };
         };
+    }
+
+    // handleWicketDetailsForBatsman 
+    if (Object.keys(wicketDetails).some((key) => wicketDetails[key])) {
+        if (whoOutIndex > -1) {
+            currentInning.batsmen[whoOutIndex] = {
+                ...currentInning.batsmen[whoOutIndex],
+                status: OUT,
+                wicketDetails: {
+                    bowler: bowler.name,
+                    type: wicketDetails.wicketType,
+                    outBy: wicketDetails.outByPlayer
+                }
+            }
+        }
+    }
+
+    // handleTotalWickets and fall of wickets
+    if (isWicketBall(currentBall)) {
+        currentInning = {
+            ...currentInning,
+            totalWickets: currentInning.totalWickets + 1
+        }
+
+        if (whoOutIndex > -1) {
+            let totalOvers = getTotalOvers(currentInning.overs);
+            currentInning = {
+                ...currentInning,
+                fow: currentInning.fow ? [...currentInning.fow, { score: currentInning.totalScore, totalOvers: totalOvers, batsman: currentInning.batsmen[whoOutIndex] }] : [{ score: currentInning.totalScore, totalOvers: totalOvers, batsman: currentInning.batsmen[whoOutIndex] }]
+            }
+        }
     }
 
     // Check if over is completed and is maiden or not 
@@ -422,31 +437,29 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
             isOverMaiden = true;
         }
 
-        index = currentInning.batsmen.findIndex((batsman) => batsman.name === striker.name);
-        if (index > -1) {
+        if (strikerIndex > -1) {
             let status;
-            if (currentInning.batsmen[index].status === NOT_OUT_ON_STRIKE) {
+            if (currentInning.batsmen[strikerIndex].status === NOT_OUT_ON_STRIKE) {
                 status = NOT_OUT_ON_NON_STRIKE;
-            } else if (currentInning.batsmen[index].status === NOT_OUT_ON_NON_STRIKE) {
+            } else if (currentInning.batsmen[strikerIndex].status === NOT_OUT_ON_NON_STRIKE) {
                 status = NOT_OUT_ON_STRIKE;
             }
-            currentInning.batsmen[index] = {
-                ...currentInning.batsmen[index],
+            currentInning.batsmen[strikerIndex] = {
+                ...currentInning.batsmen[strikerIndex],
                 status: status
             }
         }
 
-        index = currentInning.batsmen.findIndex((batsman) => batsman.name === nonStriker.name);
-        if (index > -1) {
+        if (nonStrikerIndex > -1) {
             let status;
-            if (currentInning.batsmen[index].status === NOT_OUT_ON_STRIKE) {
+            if (currentInning.batsmen[nonStrikerIndex].status === NOT_OUT_ON_STRIKE) {
                 status = NOT_OUT_ON_NON_STRIKE;
-            } else if (currentInning.batsmen[index].status === NOT_OUT_ON_NON_STRIKE) {
+            } else if (currentInning.batsmen[nonStrikerIndex].status === NOT_OUT_ON_NON_STRIKE) {
                 status = NOT_OUT_ON_STRIKE;
             }
 
-            currentInning.batsmen[index] = {
-                ...currentInning.batsmen[index],
+            currentInning.batsmen[nonStrikerIndex] = {
+                ...currentInning.batsmen[nonStrikerIndex],
                 status: status
             };
         };
@@ -469,35 +482,5 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
         };
     }
 
-    // handleWicketDetailsForBatsman 
-    if (Object.keys(wicketDetails).some((key) => wicketDetails[key])) {
-        if ([LBW, BOWLED, CAUGHT_BY, STUMPED].includes(wicketDetails.wicketType)) {
-            index = currentInning.batsmen.findIndex((batsman) => batsman.name === striker.name);
-            if (index > -1) {
-                currentInning.batsmen[index] = {
-                    ...currentInning.batsmen[index],
-                    status: OUT,
-                    wicketDetails: {
-                        bowler: bowler.name,
-                        type: wicketDetails.wicketType,
-                        outBy: wicketDetails.outByPlayer
-                    }
-                }
-            }
-        } else {
-            index = currentInning.batsmen.findIndex((batsman) => batsman.name === wicketDetails.whoOut);
-            if (index > -1) {
-                currentInning.batsmen[index] = {
-                    ...currentInning.batsmen[index],
-                    status: OUT,
-                    wicketDetails: {
-                        bowler: bowler.name,
-                        type: wicketDetails.wicketType,
-                        outBy: wicketDetails.outByPlayer
-                    }
-                }
-            }
-        }
-    }
     return currentInning;
 }

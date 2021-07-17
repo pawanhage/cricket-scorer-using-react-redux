@@ -98,6 +98,7 @@ function UpdateScore({
 
     const [batsmanOnStrike, setBatsmanOnStrike] = useState(strikerBatsman ? strikerBatsman.name : null);
     const [batsmanOnNonStrike, setBatsmanOnNonStrike] = useState(nonStrikerBatsman ? nonStrikerBatsman.name : null);
+    const [wicketDetailsState, dispatchWicketDetails] = useReducer(wicketDetailsReducer, initialWicketDetailsState);
 
     const [nextBowler, setNextBowler] = useState(currentBowler);
 
@@ -162,8 +163,6 @@ function UpdateScore({
         setRunsOptions([...newRunsOptions]);
     }, [extra]);
 
-    const [wicketDetailsState, dispatchWicketDetails] = useReducer(wicketDetailsReducer, initialWicketDetailsState);
-
     /* if wicket is set and disable other invalid extra option options */
     useEffect(() => {
         const newExtrasOptions = cloneDeep(EXTRAS_OPTIONS);
@@ -182,11 +181,17 @@ function UpdateScore({
     }, [wicketDetailsState.wicketType, extra]);
 
     useEffect(() => {
-        if ([CAUGHT_BY, STUMPED, FIELD_OBSTRUCT, RUN_OUT].includes(wicketDetailsState.wicketType)) {
+        if ([FIELD_OBSTRUCT, RUN_OUT].includes(wicketDetailsState.wicketType)) {
             dispatchWicketDetails({ type: 'SET_WHO_OUT', payload: null });
             dispatchWicketDetails({ type: 'SET_OUT_BY_PLAYER', payload: null });
         }
-    }, [wicketDetailsState.wicketType])
+
+        if ([BOWLED, LBW, HIT_WICKET, STUMPED, CAUGHT_BY].includes(wicketDetailsState.wicketType)) {
+            dispatchWicketDetails({ type: 'SET_WHO_OUT', payload: batsmanOnStrike });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [wicketDetailsState.wicketType]);
+
     const [currentBall, setCurrentBall] = useState('');
 
     useEffect(() => {
@@ -211,7 +216,7 @@ function UpdateScore({
             }
         }
         setCurrentBall(ball);
-    }, [runs, extra, wicketDetailsState.wicketType])
+    }, [runs, extra, wicketDetailsState.wicketType]);
 
     const batsmenYetToBatOrRetdHurtOptions = batsmenYetToBatOrRetdHurt.map((batsman) => {
         return { name: batsman.name, value: batsman.name }
@@ -320,7 +325,7 @@ function UpdateScore({
                 innings[currentInningIndex].batsmen[index] = {
                     ...innings[currentInningIndex].batsmen[index],
                     status: NOT_OUT_ON_STRIKE,
-                    order: batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide ? 0 : (innings[currentInningIndex].batsmen[index].order ? innings[currentInningIndex].batsmen[index].order : totalWickets + 1)
+                    order: batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide ? 1 : (!!innings[currentInningIndex].batsmen[index].order ? innings[currentInningIndex].batsmen[index].order : totalWickets + 1)
                 }
             }
 
@@ -329,7 +334,7 @@ function UpdateScore({
                 innings[currentInningIndex].batsmen[index] = {
                     ...innings[currentInningIndex].batsmen[index],
                     status: NOT_OUT_ON_NON_STRIKE,
-                    order: batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide ? 1 : (innings[currentInningIndex].batsmen[index].order ? innings[currentInningIndex].batsmen[index].order : totalWickets + 1)
+                    order: batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide ? 2 : (!!innings[currentInningIndex].batsmen[index].order ? innings[currentInningIndex].batsmen[index].order : totalWickets + 1)
                 }
             }
         }
