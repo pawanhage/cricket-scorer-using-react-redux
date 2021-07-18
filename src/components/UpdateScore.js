@@ -320,22 +320,51 @@ function UpdateScore({
 
     const continueMatch = () => {
         if (batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide || (lastBall.indexOf(WICKET) > -1)) {
-            let index = innings[currentInningIndex].batsmen.findIndex((batsman) => batsman.name === batsmanOnStrike);
-            if (index > -1) {
-                innings[currentInningIndex].batsmen[index] = {
-                    ...innings[currentInningIndex].batsmen[index],
+            const strikerIndex = innings[currentInningIndex].batsmen.findIndex((batsman) => batsman.name === batsmanOnStrike);
+            if (strikerIndex > -1) {
+                innings[currentInningIndex].batsmen[strikerIndex] = {
+                    ...innings[currentInningIndex].batsmen[strikerIndex],
                     status: NOT_OUT_ON_STRIKE,
-                    order: batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide ? 1 : (!!innings[currentInningIndex].batsmen[index].order ? innings[currentInningIndex].batsmen[index].order : totalWickets + 1)
+                    order: batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide ? 1 : (innings[currentInningIndex].batsmen[strikerIndex].order ? innings[currentInningIndex].batsmen[strikerIndex].order : totalWickets + 2)
                 }
             }
 
-            index = innings[currentInningIndex].batsmen.findIndex((batsman) => batsman.name === batsmanOnNonStrike);
-            if (index > -1) {
-                innings[currentInningIndex].batsmen[index] = {
-                    ...innings[currentInningIndex].batsmen[index],
+            const nonStrikerIndex = innings[currentInningIndex].batsmen.findIndex((batsman) => batsman.name === batsmanOnNonStrike);
+            if (nonStrikerIndex > -1) {
+                innings[currentInningIndex].batsmen[nonStrikerIndex] = {
+                    ...innings[currentInningIndex].batsmen[nonStrikerIndex],
                     status: NOT_OUT_ON_NON_STRIKE,
-                    order: batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide ? 2 : (!!innings[currentInningIndex].batsmen[index].order ? innings[currentInningIndex].batsmen[index].order : totalWickets + 1)
+                    order: batsmenYetToBatOrRetdHurt.length === totalPlayersPerSide ? 2 : (innings[currentInningIndex].batsmen[nonStrikerIndex].order ? innings[currentInningIndex].batsmen[nonStrikerIndex].order : totalWickets + 2)
                 }
+            }
+
+            if (innings[currentInningIndex].partnerships) {
+                innings[currentInningIndex].partnerships = [
+                    ...innings[currentInningIndex].partnerships,
+                    {
+                        [innings[currentInningIndex].batsmen[strikerIndex].name]: {
+                            runsScored: 0,
+                            ballsFaced: 0
+                        },
+                        [innings[currentInningIndex].batsmen[nonStrikerIndex].name]: {
+                            runsScored: 0,
+                            ballsFaced: 0
+                        }
+                    }
+                ]
+            } else {
+                innings[currentInningIndex].partnerships = [
+                    {
+                        [innings[currentInningIndex].batsmen[strikerIndex].name]: {
+                            runsScored: 0,
+                            ballsFaced: 0,
+                        },
+                        [innings[currentInningIndex].batsmen[nonStrikerIndex].name]: {
+                            runsScored: 0,
+                            ballsFaced: 0
+                        }
+                    }
+                ]
             }
         }
 
@@ -404,7 +433,7 @@ function UpdateScore({
         if (batsmanBowlerJsx.length) {
             batsmanBowlerJsx.push(
                 <div key={batsmanBowlerJsx.length} style={{ textAlign: 'center' }}>
-                    <Button type="button" disabled={!batsmanOnStrike || !batsmanOnNonStrike || !nextBowler} label="Continue" onClick={() => continueMatch()} />
+                    <Button type="button" disabled={(!batsmanOnStrike || !batsmanOnNonStrike || !nextBowler) || (batsmanOnStrike === batsmanOnNonStrike)} label="Continue" onClick={() => continueMatch()} />
                 </div>
             );
         }

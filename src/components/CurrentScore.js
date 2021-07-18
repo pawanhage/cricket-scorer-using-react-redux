@@ -1,7 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { COMPLETED, IN_PROGRESS, YET_TO_START } from '../constants';
-import { getCurrentBowler, getCurrentInning, getCurrentOver, getCurrentRunRate, getLiveScore, getNonStrikerBatsman, getRequiredRunRate, getStrikerBatsman, getTeams, getTotalOversCount, getTotalOversPerInning, getTotalPlayersPerSide, getYetToBatOrRetdHurtBatsmen } from '../redux'
+import {
+    getCurrentBowler,
+    getCurrentInning,
+    getCurrentOver,
+    getCurrentRunRate,
+    getNonStrikerBatsman,
+    getRequiredRunRate,
+    getStrikerBatsman,
+    getTeams,
+    getTotalOversCount,
+    getTotalOversPerInning
+} from '../redux'
 
 function CurrentScore({
     currentInning,
@@ -16,85 +27,120 @@ function CurrentScore({
     tossResult,
     teams,
     requiredRunRate,
-    matchResult
+    matchResult,
+    fow
 }) {
+
+    const [whoWonToss,] = useState(Number(String(tossResult).split('')[2]));
+    const [tossDecision,] = useState(Number(String(tossResult).split('')[0]) === whoWonToss ? "bat" : "bowl");
 
     if (currentInning.status === IN_PROGRESS) {
         return (
             <>
-                <div class="rca-column-3 rca-no-right-padding">
+                <div class="rca-column-4 rca-no-right-padding">
                     <div class="rca-menu-widget rca-left-border">
-                        <div class="rca-padding">
+                        <div class="pad-10 rca-no-bottom-padding">
                             <span class="rca-match-title">{currentInning.battingTeam}:</span>
-                            <span class="rca-match-score">{currentInning.totalScore}/{currentInning.totalWickets} Overs: {totalOvers}</span>
-                            <span>CRR: {currentRunRate} </span>
+                            <span class="rca-match-score bold">{currentInning.totalScore}/{currentInning.totalWickets}</span>
+                            <span class="rca-match-title">Overs:</span>
+                            <span class="rca-match-score bold">{totalOvers} ({totalOversPerInning})</span>
+                            <span class="rca-match-title">CRR:</span>
+                            <span class="rca-match-score bold">{currentRunRate}</span>
+                        </div>
+                        <div class="pad-10">
                             {
                                 (() => {
                                     if (currentInning.target) {
-                                        return <span>RRR: {requiredRunRate}</span>;
+                                        return (
+                                            <>
+                                                <span class="rca-match-title">Target:</span>
+                                                <span class="rca-match-score bold">{currentInning.target}</span>
+                                                <span class="rca-match-title">RRR:</span>
+                                                <span class="rca-match-score bold">{requiredRunRate}</span>
+                                            </>
+                                        )
+                                    } else {
+                                        return (
+                                            <>
+                                                <span class="rca-match-title">Toss:</span>
+                                                <span class="rca-match-score bold">{teams[whoWonToss - 1]}({tossDecision})</span>
+                                            </>
+                                        )
                                     }
                                 })()
                             }
-                        </div>
-                    </div>
-                </div>
-                <div class="rca-column-3  rca-no-right-padding rca-no-left-padding">
-                    <div class="rca-menu-widget rca-left-border">
-                        <div class="rca-padding">
                             {
                                 (() => {
+                                    const partnership = currentInning.partnerships[currentInning.partnerships.length - 1];
+                                    const totalBallsFaced = Object.keys(partnership).reduce(((balls, key) => balls + partnership[key].ballsFaced), 0);
+                                    const lastWicketScore = fow ? fow[fow.length - 1].score : 0;
                                     return (
-                                        <div style={{ textAlignLast: 'justify' }}>
-                                            <>
-                                                {(() => {
-                                                    if (strikerBatsman) {
-                                                        return (
-                                                            <div className="rca-batsman" style={{ display: 'inline', marginRight: '5px' }}>
-                                                                <span className="player">{strikerBatsman.name}</span>
-                                                                <span><span style={{ color: '#2196F3' }}>*</span>{strikerBatsman.runsScored}({strikerBatsman.ballsFaced})</span>
-                                                            </div>
-                                                        )
-                                                    }
-                                                    return <></>
-                                                })()}
-                                            </>
-                                            <>
-                                                {(() => {
-                                                    if (nonStrikerBatsman) {
-                                                        return (
-                                                            <div className="rca-batsman" style={{ display: 'inline' }}>
-                                                                <span className="player">{nonStrikerBatsman.name}</span>
-                                                                <span>{nonStrikerBatsman.runsScored}({nonStrikerBatsman.ballsFaced})</span>
-                                                            </div>
-                                                        )
-                                                    }
-                                                    return <></>
-                                                })()}
-                                            </>
-                                        </div>
+                                        <>
+                                            <span class="rca-match-title">Partnership:</span>
+                                            <span class="rca-match-score bold">{currentInning.totalScore - lastWicketScore}({totalBallsFaced})</span>
+                                        </>
                                     )
                                 })()
                             }
                         </div>
                     </div>
                 </div>
+                <div class="rca-column-2  rca-no-right-padding rca-no-left-padding">
+                    <div class="rca-left-border" style={{ backgroundColor: 'white' }}>
+                        {
+                            (() => {
+                                return (
+                                    <>
+                                        {(() => {
+                                            if (strikerBatsman) {
+                                                return (
+                                                    <div className="pad-10 rca-no-bottom-padding">
+                                                        <div className="rca-batsman">
+                                                            <span className="player">{strikerBatsman.name}</span>
+                                                            <span style={{ float: 'right' }}><span style={{ color: '#2196F3' }}>*</span>{strikerBatsman.runsScored}({strikerBatsman.ballsFaced})</span>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
+                                            return <></>
+                                        })()}
+                                        {(() => {
+                                            if (nonStrikerBatsman) {
+                                                return (
+                                                    <div className="pad-10">
+                                                        <div className="rca-batsman">
+                                                            <span className="player">{nonStrikerBatsman.name}</span>
+                                                            <span style={{ float: 'right' }}>{nonStrikerBatsman.runsScored}({nonStrikerBatsman.ballsFaced})</span>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
+                                            return <></>
+                                        })()}
+                                    </>
+                                )
+                            })()
+                        }
+                    </div>
+                </div>
                 <div class="rca-column-6 rca-no-left-padding">
                     <div class="rca-menu-widget rca-left-border rca-right-border">
-                        <div class="rca-padding">
+                        <div className="pad-10 rca-no-bottom-padding">
                             <div className="rca-ball-detail" style={{ marginTop: '2.5px' }}>
                                 {
                                     (() => {
                                         if (currentBowler) {
                                             return (
                                                 <div className="rca-bowler-info" style={{ display: 'inline', marginRight: '5px' }}>
-                                                    <span>{currentBowler.name}: </span><span className="rca-bolwing">{currentBowler.runsGiven}-{currentBowler.wicketsTaken} in {currentBowler.totalOvers}</span>
+                                                    <span class="rca-match-title">{currentBowler.name}:</span>
+                                                    <span className="rca-bolwing">{currentBowler.runsGiven}-{currentBowler.wicketsTaken} in {currentBowler.totalOvers}</span>
                                                 </div>
                                             )
                                         }
                                     })()
                                 }
                                 <div className="rca-match-schedule" style={{ display: 'inline' }}>
-                                    <span style={{ marginRight: '5px' }}>This Over</span>
+                                    <span class="rca-match-title" style={{ marginRight: '5px' }}>This Over:</span>
                                     <ul className="rca-ball-by" style={{ display: 'inline-block' }}>
                                         {
                                             (() => {
@@ -118,6 +164,35 @@ function CurrentScore({
                                 </div>
                             </div>
                         </div>
+                        <div className="pad-10">
+                            {
+                                (() => {
+                                    if (fow) {
+                                        const lastWicket = fow[fow.length - 1];
+                                        return (
+                                            <>
+                                                <span class="rca-match-title">Last Wicket:</span>
+                                                <span class="rca-match-score bold">{lastWicket.score}-{currentInning.totalWickets} ({lastWicket.batsman.name})</span>
+                                            </>
+                                        )
+                                    }
+                                })()
+                            }
+                            {
+                                (() => {
+                                    if (currentInning.target) {
+                                        return <span class="rca-match-score bold"> {currentInning.battingTeam} NEEDS {currentInning.target - currentInning.totalScore} RUNS OFF {(((currentInning.target - currentInning.totalScore) / requiredRunRate) * 6).toFixed(0)} BALLS</span>
+                                    } else {
+                                        return (
+                                            <>
+                                                <span class="rca-match-title">Projected Score:</span>
+                                                <span class="rca-match-score bold">{(currentRunRate * totalOversPerInning).toFixed(0)}</span>
+                                            </>
+                                        )
+                                    }
+                                })()
+                            }
+                        </div>
                     </div>
                 </div>
             </>
@@ -127,18 +202,16 @@ function CurrentScore({
             <>
                 <div class="rca-column-12">
                     <div class="rca-menu-widget rca-left-border">
-                        <div class="rca-padding">
+                        <div class="rca-padding" style={{ textAlign: 'center' }}>
                             <span style={{ fontWeight: 'bold' }}>{currentInning.battingTeam} vs {currentInning.bowlingTeam} </span>
                             <span>{totalOversPerInning} Over Match, </span>
                             {
                                 (() => {
                                     if (currentInningIndex === 0) {
-                                        const whoWon = Number(String(tossResult).split('')[2]);
-                                        const decision = Number(String(tossResult).split('')[0]) === whoWon ? "bat" : "bowl";
                                         return (
                                             <>
                                                 <span style={{ fontWeight: 'bold' }} className="rca-center">
-                                                    Toss Result - {teams[whoWon - 1]} won the toss and elected to {decision} first
+                                                    Toss Result - {teams[whoWonToss - 1]} won the toss and elected to {tossDecision} first
                                                 </span>
                                             </>
                                         )
@@ -161,7 +234,7 @@ function CurrentScore({
             <>
                 <div class="rca-column-12">
                     <div class="rca-menu-widget rca-left-border">
-                        <div class="rca-padding">
+                        <div class="rca-padding" style={{ textAlign: 'center' }}>
                             <span style={{ fontWeight: 'bold' }}>1'st Inning {currentInning.bowlingTeam} - {currentInning.target - 1}, </span>
                             <span style={{ fontWeight: 'bold' }}>2'nd Inning {currentInning.battingTeam} - {currentInning.totalScore}/{currentInning.totalWickets}, {matchResult}</span>
                         </div>
@@ -174,7 +247,7 @@ function CurrentScore({
             <>
                 <div class="rca-column-12">
                     <div class="rca-menu-widget rca-left-border">
-                        <div class="rca-padding">
+                        <div class="rca-padding" style={{ textAlign: 'center' }}>
                             {
                                 (() => {
                                     let suffix = '';
@@ -209,7 +282,6 @@ const mapStateToProps = (state) => {
         teams: getTeams(state.match),
         tossResult: state.match.details.tossResult,
         matchResult: state.match.details.result,
-        innings: state.match.innings,
         currentInningIndex: state.match.currentInningIndex,
         currentInning: getCurrentInning(state.match),
         totalOvers: getTotalOversCount(state.match),
@@ -219,10 +291,8 @@ const mapStateToProps = (state) => {
         nonStrikerBatsman: getNonStrikerBatsman(state.match),
         currentOver: getCurrentOver(state.match),
         currentBowler: getCurrentBowler(state.match),
-        batsmenYetToBatOrRetdHurt: getYetToBatOrRetdHurtBatsmen(state.match),
-        totalPlayersPerSide: getTotalPlayersPerSide(state.match),
         totalOversPerInning: getTotalOversPerInning(state.match),
-        liveScore: getLiveScore(state.match)
+        fow: state.match.innings[state.match.currentInningIndex].fow
     }
 }
 

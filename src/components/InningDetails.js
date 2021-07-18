@@ -1,15 +1,32 @@
 import React from 'react'
-import { BOWLED, CAUGHT_BY, FIELD_OBSTRUCT, HIT_WICKET, LBW, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, RUN_OUT, STUMPED, YET_TO_BAT, YET_TO_START } from '../constants'
+import { BOWLED, CAUGHT_BY, COMPLETED, FIELD_OBSTRUCT, HIT_WICKET, LBW, NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, OUT, RUN_OUT, STUMPED, YET_TO_BAT, YET_TO_START } from '../constants'
 import { getTotalOvers } from '../utils/cricketUtils'
 import { TabView, TabPanel } from 'primereact/tabview';
+import RunsVsOversBarChart from './RunsVsOversBarChart';
+import TotalScoreVsOversLineChart from './TotalScoreVsOversLineChart';
 
 function InningDetails({ inning }) {
+
+    const getWicketDetailsString = (batsman) => {
+        let wicketDetails;
+        if (batsman.wicketDetails.type === BOWLED || batsman.wicketDetails.type === LBW) {
+            wicketDetails = `${batsman.wicketDetails.type} ${batsman.wicketDetails.bowler}`
+        }
+        if (batsman.wicketDetails.type === RUN_OUT || batsman.wicketDetails.type === CAUGHT_BY || batsman.wicketDetails.type === STUMPED) {
+            wicketDetails = `${batsman.wicketDetails.type} ${batsman.wicketDetails.outBy}`
+        }
+        if (batsman.wicketDetails.type === HIT_WICKET || batsman.wicketDetails.type === FIELD_OBSTRUCT) {
+            wicketDetails = `${batsman.wicketDetails.type}`
+        }
+        return wicketDetails;
+    }
+
     if (inning.status !== YET_TO_START) {
         return (
             <>
                 <TabView style={{ fontFamily: "Lato, Verdana, Helvetica, sans-serif" }}>
-                    <TabPanel header="ScoreCard">
-                        <div style={{ maxHeight: '300px', overflowY: 'scroll' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
+                    <TabPanel header="Scorecard">
+                        <div style={{ maxHeight: '350px', overflowY: 'scroll' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
                             <div class="rca-batting-score rca-padding ">
                                 <h3>{inning.battingTeam} Batting: <strong> {inning.totalScore}/{inning.totalWickets} in {getTotalOvers(inning.overs)} Overs</strong></h3>
                                 <div class="rca-row">
@@ -20,7 +37,7 @@ function InningDetails({ inning }) {
                                         <div class="rca-col">
                                         </div>
                                         <div class="rca-col">
-                                            R
+                                            Runs
                                         </div>
                                         <div class="rca-col">
                                             4s
@@ -29,7 +46,7 @@ function InningDetails({ inning }) {
                                             6s
                                         </div>
                                         <div class="rca-col">
-                                            SR
+                                            Strike Rate
                                         </div>
                                     </div>
                                 </div>
@@ -38,15 +55,7 @@ function InningDetails({ inning }) {
                                         let wicketDetails;
                                         let status;
                                         if (batsman.wicketDetails) {
-                                            if (batsman.wicketDetails.type === BOWLED || batsman.wicketDetails.type === LBW) {
-                                                wicketDetails = `${batsman.wicketDetails.type} ${batsman.wicketDetails.bowler}`
-                                            }
-                                            if (batsman.wicketDetails.type === RUN_OUT || batsman.wicketDetails.type === CAUGHT_BY || batsman.wicketDetails.type === STUMPED) {
-                                                wicketDetails = `${batsman.wicketDetails.type} ${batsman.wicketDetails.outBy}`
-                                            }
-                                            if (batsman.wicketDetails.type === HIT_WICKET || batsman.wicketDetails.type === FIELD_OBSTRUCT) {
-                                                wicketDetails = `${batsman.wicketDetails.type}`
-                                            }
+                                            wicketDetails = getWicketDetailsString(batsman);
                                         } else {
                                             if (batsman.status === NOT_OUT_ON_STRIKE || batsman.status === NOT_OUT_ON_NON_STRIKE) {
                                                 status = 'Not Out';
@@ -85,6 +94,51 @@ function InningDetails({ inning }) {
                                     <span> Sixes: <strong>{(() => inning.batsmen.reduce(((fours, batsman) => fours + batsman.sixes), 0))()}</strong></span>,
                                     <span> Extras: <strong>{(() => Object.keys(inning.extras).reduce(((extra, key) => extra + inning.extras[key]), 0))()} (WD: {inning.extras.wides}, NB: {inning.extras.noBalls}, LB: {inning.extras.legByes}, B: {inning.extras.byes}, P: {inning.extras.penaltyRuns})</strong></span>
                                 </div>
+                                {
+                                    (() => {
+                                        if (inning.status !== COMPLETED) {
+                                            return (
+                                                <div class="rca-padding">
+                                                    <span class="rca-match-title">Yet To Bat:</span>
+                                                    {
+                                                        (() => {
+                                                            return inning.batsmen.filter(batsman => ![NOT_OUT_ON_NON_STRIKE, NOT_OUT_ON_STRIKE, OUT].includes(batsman.status)).map((batsman, index, arr) => {
+                                                                return (
+                                                                    <>
+                                                                        <span class="rca-match-score">{batsman.name}<span>{index < arr.length - 1 ? ',' : ''}</span></span>
+                                                                    </>
+                                                                )
+                                                            })
+                                                        })()
+                                                    }
+                                                </div>
+                                            )
+                                        }
+                                    })()
+                                }
+                                {
+                                    inning.fow ? <div class="rca-padding">
+                                        <span class="rca-match-title">Fall Of Wickets:</span>
+                                        {
+                                            (() => {
+                                                const fow = inning.fow;
+                                                let fowJsx = [];
+                                                if (fow) {
+                                                    fowJsx = fow.map((wkt, index, arr) => {
+                                                        let wicketDetails = getWicketDetailsString(wkt.batsman);
+                                                        return (
+                                                            <>
+                                                                <span class="rca-match-score"><span className="bold">{wkt.score}-{index + 1}</span> ({wkt.batsman.name} {wicketDetails} {wkt.batsman.runsScored}({wkt.batsman.ballsFaced}), {wkt.totalOvers} Overs)<span>{index < arr.length - 1 ? ',' : ''}</span></span>
+                                                            </>
+                                                        )
+                                                    });
+                                                }
+                                                return fowJsx;
+                                            })()
+                                        }
+                                    </div>
+                                        : ''
+                                }
                             </div>
                             <div class="rca-bowling-score rca-padding">
                                 <h3> {inning.bowlingTeam} Bowling:</h3>
@@ -143,6 +197,16 @@ function InningDetails({ inning }) {
                                 }
                                 <div class="rca-clear"></div>
                             </div>
+                        </div>
+                    </TabPanel>
+                    <TabPanel header="Runs Per Over">
+                        <div style={{ maxHeight: '350px', overflowY: 'scroll' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
+                            <RunsVsOversBarChart overs={inning.overs}></RunsVsOversBarChart>
+                        </div>
+                    </TabPanel>
+                    <TabPanel header="Score Analysis">
+                        <div style={{ maxHeight: '350px', overflowY: 'scroll' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
+                            <TotalScoreVsOversLineChart team={inning.battingTeam} overs={inning.overs} fow={inning.fow}></TotalScoreVsOversLineChart>
                         </div>
                     </TabPanel>
                 </TabView>

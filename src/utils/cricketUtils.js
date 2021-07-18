@@ -482,5 +482,15 @@ export const getUpdatedInningStats = (currentInning, currentBall, striker, nonSt
         };
     }
 
+    // handle partnerships details
+    const { runsScored, ballsFaced } = getUpdatedBatsmanStats(currentInning.partnerships[currentInning.partnerships.length - 1][striker.name], currentBall)
+    currentInning.partnerships[currentInning.partnerships.length - 1] = {
+        ...currentInning.partnerships[currentInning.partnerships.length - 1],
+        [striker.name]: {
+            runsScored: runsScored,
+            ballsFaced: ballsFaced
+        }
+    }
+
     return currentInning;
 }
