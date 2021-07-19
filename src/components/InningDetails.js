@@ -3,7 +3,7 @@ import { BOWLED, CAUGHT_BY, COMPLETED, FIELD_OBSTRUCT, HIT_WICKET, LBW, NOT_OUT_
 import { getTotalOvers } from '../utils/cricketUtils'
 import { TabView, TabPanel } from 'primereact/tabview';
 import RunsVsOversBarChart from './RunsVsOversBarChart';
-import TotalScoreVsOversLineChart from './TotalScoreVsOversLineChart';
+import Partnerships from './Partnerships';
 
 function InningDetails({ inning }) {
 
@@ -199,14 +199,14 @@ function InningDetails({ inning }) {
                             </div>
                         </div>
                     </TabPanel>
-                    <TabPanel header="Runs Per Over">
-                        <div style={{ maxHeight: '350px', overflowY: 'scroll' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
-                            <RunsVsOversBarChart overs={inning.overs}></RunsVsOversBarChart>
+                    <TabPanel header="Partnerships">
+                        <div style={{ maxHeight: '350px', overflowY: 'auto' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
+                            <Partnerships inning={inning}></Partnerships>
                         </div>
                     </TabPanel>
-                    <TabPanel header="Score Analysis">
-                        <div style={{ maxHeight: '350px', overflowY: 'scroll' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
-                            <TotalScoreVsOversLineChart team={inning.battingTeam} overs={inning.overs} fow={inning.fow}></TotalScoreVsOversLineChart>
+                    <TabPanel header="Runs Per Over">
+                        <div style={{ maxHeight: '350px', overflowY: 'auto' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
+                            <RunsVsOversBarChart overs={inning.overs}></RunsVsOversBarChart>
                         </div>
                     </TabPanel>
                 </TabView>

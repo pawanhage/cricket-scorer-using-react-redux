@@ -2,7 +2,7 @@ import React from 'react'
 import { TabView, TabPanel } from 'primereact/tabview';
 import InningDetails from './InningDetails';
 import { connect } from 'react-redux';
-import TotalScoreVsOversLineChart from './TotalScoreVsOversLineChart';
+import ComparisionChart from './ComparisionChart';
 import { YET_TO_START } from '../constants';
 
 function FullScorecard({ innings, currentInningIndex }) {
@@ -24,8 +24,8 @@ function FullScorecard({ innings, currentInningIndex }) {
                     })()
                 }
                 <TabPanel disabled={innings[0].status === YET_TO_START} header="Comparison">
-                    <div style={{ maxHeight: '350px', overflowY: 'scroll' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
-                        <TotalScoreVsOversLineChart innings={innings}></TotalScoreVsOversLineChart>
+                    <div style={{ maxHeight: '350px' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
+                        <ComparisionChart innings={innings}></ComparisionChart>
                     </div>
                 </TabPanel>
             </TabView>

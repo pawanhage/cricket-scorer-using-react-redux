@@ -254,13 +254,13 @@ function UpdateScore({
             let matchResult;
             if (innings[currentInningIndex].target) {
                 if (innings[currentInningIndex].totalScore >= innings[currentInningIndex].target) {
-                    matchResult = `${innings[currentInningIndex].battingTeam} Won By ${innings[currentInningIndex].batsmen.length - 1 - innings[currentInningIndex].totalWickets} Wickets`
+                    matchResult = `Match Result - ${innings[currentInningIndex].battingTeam} Won By ${innings[currentInningIndex].batsmen.length - 1 - innings[currentInningIndex].totalWickets} Wickets`
                     innings[currentInningIndex].status = COMPLETED;
                 } else if (innings[currentInningIndex].status === COMPLETED) {
                     if (innings[currentInningIndex].totalScore === innings[currentInningIndex].target - 1) {
-                        matchResult = 'Match Tied';
+                        matchResult = 'Match Result - Tied';
                     } else {
-                        matchResult = `${innings[currentInningIndex].bowlingTeam} Won By ${innings[currentInningIndex].target - innings[currentInningIndex].totalScore - 1} Runs`;
+                        matchResult = `Match Result - ${innings[currentInningIndex].bowlingTeam} Won By ${innings[currentInningIndex].target - innings[currentInningIndex].totalScore - 1} Runs`;
                     }
                 }
             }

@@ -8,8 +8,7 @@ function RunsVsOversBarChart({ overs }) {
             {
                 label: 'Runs',
                 backgroundColor: '#2196F3',
-                data: Array.from(overs.map(over => over.totalRunsInThisOver)),
-                yAxisID: 'y'
+                data: Array.from(overs.map(over => over.totalRunsInThisOver))
             }
         ]
     };

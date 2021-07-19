@@ -4,7 +4,7 @@ import { YET_TO_START } from '../constants';
 
 const COLORS = ['#2196F3', '#FFFF00'];
 
-function TotalScoreVsOversLineChart({ innings, team, overs, fow }) {
+function ComparisionChart({ innings }) {
     let basicData;
     if (innings) {
         let maxOvers;
@@ -18,6 +18,7 @@ function TotalScoreVsOversLineChart({ innings, team, overs, fow }) {
             labels: [0, ...Array.from((Array(maxOvers.length).keys())).map((key => `${key + 1}`))],
             datasets: innings.map((inning, index) => {
                 return {
+                    type: 'line',
                     label: inning.battingTeam,
                     data: [0, ...inning.overs.map((over, index) => {
                         let score = 0;
@@ -25,48 +26,33 @@ function TotalScoreVsOversLineChart({ innings, team, overs, fow }) {
                             score = score + inning.overs[i].totalRunsInThisOver
                         }
                         return score;
-                    }), ...inning.fow ? Array.from(inning.fow.map(wkt => wkt.score)) : []].sort((a, b) => a - b),
+                    })],
                     fill: false,
                     borderColor: COLORS[index],
                     tension: .4,
-                    radius: function (context) {
-                        let index = context.dataIndex;
-                        let value = context.dataset.data[index];
-                        return inning.fow && inning.fow.some(wkt => wkt.score === value) ? 5 : 0
-                    },
+                    radius: 0,
                     pointBackgroundColor: COLORS[index]
                 }
             })
         };
-    } else {
+
         basicData = {
-            labels: [0, ...Array.from((Array(overs.length).keys())).map((key => `${key + 1}`))],
+            ...basicData,
             datasets: [
-                {
-                    label: team,
-                    data: [0, ...overs.map((over, index) => {
-                        let score = 0;
-                        for (let i = 0; i <= index; i++) {
-                            score = score + overs[i].totalRunsInThisOver
-                        }
-                        return score;
-                    }), ...fow ? Array.from(fow.map(wkt => wkt.score)) : []].sort((a, b) => a - b),
-                    fill: false,
-                    borderColor: '#2196F3',
-                    tension: .4,
-                    radius: function (context) {
-                        let index = context.dataIndex;
-                        let value = context.dataset.data[index];
-                        return fow && fow.some(wkt => wkt.score === value) ? 5 : 0
-                    },
-                    pointBackgroundColor: '#2196F3'
-                }
+                ...basicData.datasets,
+                ...innings.map((inning, index) => {
+                    return {
+                        type: 'bar',
+                        label: `${inning.battingTeam} Runs Per Over`,
+                        data: [0, ...Array.from(inning.overs.map(over => over.totalRunsInThisOver))],
+                        backgroundColor: COLORS[index]
+                    }
+                })
             ]
-        };
+        }
     }
 
     let basicOptions = {
-        responsive: true,
         maintainAspectRatio: false,
         aspectRatio: .6,
         plugins: {
@@ -83,10 +69,9 @@ function TotalScoreVsOversLineChart({ innings, team, overs, fow }) {
                 },
                 grid: {
                     color: '#ebedef'
-                }
+                },
             },
             y: {
-                stacked: true,
                 ticks: {
                     color: '#495057'
                 },
@@ -104,4 +89,4 @@ function TotalScoreVsOversLineChart({ innings, team, overs, fow }) {
     )
 }
 
-export default TotalScoreVsOversLineChart
+export default ComparisionChart
