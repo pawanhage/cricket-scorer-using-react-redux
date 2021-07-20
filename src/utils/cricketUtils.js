@@ -137,7 +137,6 @@ export const getRunsFromCurrentBall = (currentBall) => {
             return Number(ball);
         }
     }
-    console.log('Total Runs from ball', currentBall.reduce((acc, curr) => acc = acc + getRun(curr), 0));
     return currentBall.reduce((acc, curr) => acc = acc + getRun(curr), 0);
 }
 
