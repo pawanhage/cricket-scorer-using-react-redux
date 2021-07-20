@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import './App.scss';
 import FullScorecard from './components/FullScorecard';
 import MatchDetails from './components/MatchDetails';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
@@ -29,7 +28,7 @@ function App({ liveScore }) {
                 <div className="rca-row">
                     <div className="rca-column-12">
                         <div className="rca-mini-widget rca-tab-simple">
-                            <div id="rtab-1" className="rca-padding rca-tab-content active">
+                            <div id="rtab-1" className="rca-padding">
                                 <div className="rca-column-12">
                                     <div className="rca-blog-content">
                                         <div className="rca-padding">

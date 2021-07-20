@@ -24,7 +24,7 @@ function FullScorecard({ innings, currentInningIndex }) {
                     })()
                 }
                 <TabPanel disabled={innings[0].status === YET_TO_START} header="Comparison">
-                    <div style={{ maxHeight: '350px' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
+                    <div style={{ maxHeight: '350px' }} class="rca-padding rca-no-top-padding rca-no-bottom-padding">
                         <ComparisionChart innings={innings}></ComparisionChart>
                     </div>
                 </TabPanel>

@@ -11,6 +11,223 @@ body {
     box-sizing: border-box;
 }
 
+.App {
+    padding: 20px;
+}
+
+.wdh-20 {
+    width: 20em;
+}
+
+.marg-10 {
+    margin: 10px;
+}
+
+.display-inline-flex {
+    display: inline-flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.display-inline {
+    display: inline;
+}
+
+.bgColorYellow {
+    background-color: rgb(255, 196, 0);
+}
+
+.bgColorBlue {
+    background-color: rgb(0, 225, 255);
+}
+
+.chip {
+    display: inline-flex;
+    flex-direction: row;
+    background-color: #e5e5e5;
+    border: none;
+    cursor: default;
+    height: 36px;
+    outline: none;
+    padding: 0;
+    font-size: 14px;
+    color: #333333;
+    font-family: "Open Sans", sans-serif;
+    white-space: nowrap;
+    align-items: center;
+    border-radius: 16px;
+    vertical-align: middle;
+    text-decoration: none;
+    justify-content: center;
+    margin: 2px 2px 2px 0px;
+}
+
+.chip-content {
+    cursor: inherit;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    white-space: nowrap;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.marg-top-10 {
+    margin-top: 10px;
+}
+
+.display-inline-grid {
+    display: inline-grid;
+}
+
+.wdh-16 {
+    width: 16em;
+}
+
+.text-align-center {
+    text-align: center;
+}
+
+.marg-right-10 {
+    margin-right: 10px;
+}
+
+.marg-left-right-bottom-10 {
+    margin: 0px 10px 10px 10px;
+}
+
+.marg-left-10 {
+    margin-left: 10px;
+}
+
+.displayInline {
+    display: inline;
+}
+
+.p-inputtext {
+    width: 4em;
+}
+
+.pad-10 {
+    padding: 10px;
+}
+
+.pad-6 {
+    padding: 6px;
+}
+
+.textGroups--table {
+    display: table;
+
+    .textGroup {
+        display: table;
+    }
+
+    .label,
+    label,
+    .field {
+        display: table;
+        justify-content: center;
+        padding: 0.3rem;
+    }
+}
+
+.displayInlineTable {
+    display: inline-table !important;
+}
+
+.display-grid {
+    display: grid;
+}
+
+.marg-bottom-10 {
+    margin-bottom: 10px;
+}
+
+.marg0 {
+    margin: 0px;
+}
+
+.marg-top-right-bottom-10 {
+    margin: 10px 10px 10px 0px;
+}
+
+.p-sidebar-mask.p-component-overlay {
+    background: revert !important;
+}
+
+.p-sidebar-right {
+    width: auto !important;
+}
+
+.equal-width {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.pad-top-10 {
+    padding-top: 10px !important;
+}
+
+.min-ht-unset {
+    min-height: unset !important;
+}
+
+.p-sidebar-bottom {
+    height: 15rem !important;
+}
+
+.p-component {
+    font-size: 14px !important;
+}
+
+.p-tabview .p-tabview-panels {
+    padding-top: 0px !important;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.pad-10 {
+    padding: 10px;
+}
+
+.progress {
+    padding: 0;
+    width: 25%;
+    height: 30px;
+    overflow: hidden;
+    background: #e5e5e5;
+    display: inline-block;
+}
+
+.barL {
+    position: relative;
+    float: left;
+    min-width: 1%;
+    height: 100%;
+    background: #66bb6a;
+}
+
+.barR {
+    position: relative;
+    float: right;
+    min-width: 1%;
+    height: 100%;
+    background: #ffa726;
+}
+
+.percent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    font-size: 12px;
+    color: white;
+}
+
 .rca-container {
     width: 100%;
     max-width: 1280px;
@@ -40,9 +257,10 @@ a {
     color: #4d4d4d;
     text-decoration: none;
 }
+
 a:hover,
 a:focus {
-    color: #2196F3;
+    color: #2196f3;
     text-decoration: none;
 }
 
@@ -60,8 +278,8 @@ button {
 }
 
 .theme-btn {
-    color: #2196F3;
-    border: 1px solid #2196F3;
+    color: #2196f3;
+    border: 1px solid #2196f3;
     font-size: 14px;
     font-weight: 400;
     padding: 7px 15px;
@@ -70,8 +288,9 @@ button {
     border-radius: 3px;
     display: inline-block;
 }
+
 .theme-btn:hover {
-    background: #2196F3;
+    background: #2196f3;
     color: #fff;
 }
 
@@ -85,6 +304,7 @@ button {
     display: inline-block;
     position: relative;
 }
+
 .nav-back-btn:before {
     top: 50%;
     left: 10px;
@@ -99,6 +319,7 @@ button {
     border-width: 8px;
     margin-top: -8px;
 }
+
 .nav-back-btn:hover {
     color: #d91e18;
     text-decoration: underline;
@@ -235,7 +456,7 @@ button {
 }
 
 .rca-theme-text {
-    color: #2196F3;
+    color: #2196f3;
 }
 
 .rca-basic-text {
@@ -253,6 +474,7 @@ button {
 .rca-vs {
     vertical-align: middle;
 }
+
 .rca-vs:before {
     border-radius: 50%;
     background-color: #1eb848;
@@ -274,10 +496,12 @@ button {
     border-radius: 3px;
     z-index: 99;
 }
+
 .rca-powered h2 {
     font-size: 13px;
     padding: 0 10px 0 0px !important;
 }
+
 .rca-powered h2 a:hover,
 .rca-powered h2 a:focus {
     color: #4d4d4d;
@@ -296,15 +520,15 @@ button {
 }
 
 .rca-left-border {
-    border-left: 5px solid #2196F3;
+    border-left: 5px solid #2196f3;
 }
 
 .rca-right-border {
-    border-right: 5px solid #2196F3;
+    border-right: 5px solid #2196f3;
 }
 
 .rca-top-border {
-    border-top: 5px solid #2196F3;
+    border-top: 5px solid #2196f3;
 }
 
 .rca-no-padding {
@@ -331,6 +555,7 @@ button {
     padding: 10px 10px;
     display: block;
 }
+
 .rca-padding.rca-medium-widget {
     padding: 15px 20px;
 }
@@ -346,6 +571,7 @@ button {
 .rca-season-list li {
     display: inline-block;
 }
+
 .rca-season-list li a {
     padding: 15px 15px;
     text-align: center;
@@ -359,6 +585,7 @@ button {
     padding-right: 5px;
     margin: 0px;
 }
+
 .rca-match-title .rca-match-info {
     margin: 0;
 }
@@ -390,6 +617,7 @@ button {
     position: relative;
     font-weight: bold;
 }
+
 .rca-live-label::before {
     content: "";
     width: 10px;
@@ -404,6 +632,7 @@ button {
 .rca-match-series h2 {
     padding: 0px;
 }
+
 .rca-match-series h2 a {
     display: block;
     padding: 15px 20px;
@@ -415,6 +644,7 @@ button {
 .rca-match-series .rca-match-detail {
     margin-bottom: 20px;
 }
+
 .rca-match-series .rca-match-detail:last-child {
     margin: 0px;
 }
@@ -433,13 +663,16 @@ button {
     border-bottom: 2px solid #e6e6e6;
     padding: 10px 10px 0 10px;
 }
+
 .rca-tab-list.small {
     padding-top: 0;
     border-bottom-width: 0;
 }
+
 .rca-tab-list.small li {
     border-bottom-width: 2px;
 }
+
 .rca-tab-list li {
     display: inline-block;
     font-size: 16px;
@@ -451,20 +684,23 @@ button {
     margin: 0px 7px 0px 7px;
     border-bottom: 4px solid transparent;
 }
+
 .rca-tab-list li a {
     display: block;
     padding: 5px 5px;
 }
+
 .rca-tab-list li:hover,
 .rca-tab-list li:focus,
 .rca-tab-list li.active {
     color: #4d4d4d;
-    border-bottom-color: #2196F3;
+    border-bottom-color: #2196f3;
 }
 
 .rca-tab-content {
     display: none;
 }
+
 .rca-tab-content.active {
     display: block;
 }
@@ -476,22 +712,26 @@ button {
 .rca-inside-tab {
     margin-bottom: 5px;
 }
+
 .rca-inside-tab h2 {
     margin: 0px;
     padding: 15px 10px;
-    background-color: #2196F3;
+    background-color: #2196f3;
     color: #fff;
     font-size: 16px;
     cursor: pointer;
 }
+
 .rca-inside-tab h2 i {
     float: right;
     font-size: 20px;
     line-height: 20px;
 }
+
 .rca-inside-tab .rca-inside-content {
     display: none;
 }
+
 .rca-inside-tab.active .rca-inside-content {
     display: block;
 }
@@ -499,9 +739,11 @@ button {
 .rca-match-info {
     margin: 5px 0px;
 }
+
 .rca-match-info span {
     padding-right: 10px;
 }
+
 .rca-match-info span:last-child {
     padding: 0px;
 }
@@ -511,9 +753,11 @@ button {
     position: relative;
     color: #7d7d7d;
 }
+
 .rca-batsman.striker {
     color: #f9690e;
 }
+
 .rca-batsman::before {
     content: "";
     position: absolute;
@@ -523,6 +767,7 @@ button {
     background-size: contain;
     left: 0px;
 }
+
 .rca-batsman .player {
     min-width: 100px;
     display: inline-block;
@@ -536,12 +781,14 @@ button {
     background-color: #b3b3b3;
     color: #fff;
 }
+
 .rca-ball-by li.w {
     background-color: #d91e18;
 }
+
 .rca-ball-by li.b4,
 .rca-ball-by li.b6 {
-    background-color: #2196F3; 
+    background-color: #2196f3;
 }
 
 .rca-bowler-info {
@@ -550,8 +797,9 @@ button {
     font-weight: 300;
     margin: 10px 0px; */
 }
+
 .rca-bowler-info .rca-bolwing {
-    color: #2196F3;
+    color: #2196f3;
 }
 
 .rca-score-status {
@@ -559,16 +807,19 @@ button {
     padding-bottom: 0px;
     position: relative;
 }
+
 .rca-score-status .rca-status-scroll {
     border-left: 3px solid #1eb848;
     line-height: 20px;
     padding: 0px 10px;
 }
+
 .rca-score-status .rca-bullet-list {
     position: absolute;
     top: 11px;
     right: 0px;
 }
+
 .rca-score-status .rca-bullet-list li {
     width: 7px;
     height: 7px;
@@ -577,6 +828,7 @@ button {
     background-color: #b3b3b3;
     cursor: pointer;
 }
+
 .rca-score-status .rca-bullet-list li.active {
     background-color: #1eb848;
 }
@@ -589,12 +841,15 @@ button {
 .rca-schedule-widget .rca-schedule-top {
     font-weight: 700;
 }
+
 .rca-schedule-widget .rca-schedule-top span {
     padding: 0px 10px;
 }
+
 .rca-schedule-widget .rca-schedule-top a {
     display: inline-block;
 }
+
 .rca-schedule-widget .rca-schedule-top a.active {
     color: #1eb848;
 }
@@ -609,36 +864,45 @@ button {
     padding: 10px 20px;
     margin: 10px 0px;
 }
+
 .rca-schedule-detail.rca-test {
     background-color: #ffebee;
 }
+
 .rca-schedule-detail.rca-odi {
     background-color: #fff9c4;
 }
+
 .rca-schedule-detail.rca-t20 {
     background-color: #e3f2fd;
 }
+
 .rca-schedule-detail h2 {
     font-size: 18px;
     margin: 0px 0px 5px 0px;
 }
+
 .rca-schedule-detail h2 a {
     display: block;
 }
+
 .rca-schedule-detail h2 a .rca-team {
     min-width: 150px;
     color: #4d4d4d;
     display: inline-block;
 }
+
 .rca-schedule-detail h2 a .rca-match-time {
     color: #7d7d7d;
 }
+
 .rca-schedule-detail h2 a:hover .rca-team,
 .rca-schedule-detail h2 a:hover .rca-match-time,
 .rca-schedule-detail h2 a:focus .rca-team,
 .rca-schedule-detail h2 a:focus .rca-match-time {
     color: #1eb848;
 }
+
 .rca-schedule-detail p {
     margin: 0px;
     color: #7d7d7d;
@@ -669,21 +933,26 @@ button {
     padding: 5px;
     border-right: 1px solid #e6e6e6;
 }
+
 .rca-week-day:last-child {
     border-right: none;
 }
+
 .rca-week-day .rca-schedule-detail {
     padding: 5px;
     margin: 5px 0px;
 }
+
 .rca-week-day .rca-schedule-detail h2 {
     font-size: 13px;
     margin: 0px;
 }
+
 .rca-week-day .rca-schedule-detail h2 .rca-team {
     min-width: 0px;
     margin-left: 3px;
 }
+
 .rca-week-day .rca-schedule-detail h2 .rca-match-time {
     text-transform: lowercase;
 }
@@ -691,25 +960,31 @@ button {
 .rca-medium-widget {
     font-size: 16px;
 }
+
 .rca-medium-widget .rca-match-title,
 .rca-medium-widget .rca-match-info,
 .rca-medium-widget .rca-live-label {
     text-align: center;
     margin-bottom: 10px;
 }
+
 .rca-medium-widget .rca-match-title {
     font-size: 18px;
     margin-bottom: 10px;
 }
+
 .rca-medium-widget .rca-batsman {
     font-size: 18px;
 }
+
 .rca-medium-widget .rca-batsman .player {
     min-width: 150px;
 }
+
 .rca-medium-widget .rca-match-schedule {
     font-weight: 500;
 }
+
 .rca-medium-widget .rca-ball-by {
     margin-top: 10px;
 }
@@ -718,40 +993,48 @@ button {
 .rca-bowling-score {
     border-bottom: 1px solid #e6e6e6;
 }
+
 .rca-batting-score.rca-no-border,
 .rca-bowling-score.rca-no-border {
     border-bottom: none;
 }
+
 .rca-batting-score h3,
 .rca-bowling-score h3 {
     font-size: 20px;
     font-weight: 300;
     margin: 5px 0px 20px 0px;
 }
+
 .rca-batting-score .rca-table,
 .rca-bowling-score .rca-table {
     width: 100%;
     padding: 10px;
 }
+
 .rca-batting-score .rca-header,
 .rca-bowling-score .rca-header {
     width: 100%;
     padding: 10px;
     background: #f2f2f2;
 }
+
 .rca-batting-score .rca-score-bottom,
 .rca-bowling-score .rca-score-bottom {
     margin: 20px 0px 10px 0px;
 }
+
 .rca-batting-score .rca-col,
 .rca-bowling-score .rca-col {
     display: table-cell;
-    width: 15%;
+    width: 14%;
 }
+
 .rca-batting-score .rca-col.small,
 .rca-bowling-score .rca-col.small {
     width: 10%;
 }
+
 .rca-batting-score .rca-col.rca-player,
 .rca-bowling-score .rca-col.rca-player {
     width: 25%;
@@ -765,25 +1048,31 @@ button {
     color: #1eb848;
     font-weight: 700;
 }
+
 .rca-switch span {
     display: inline-block;
     padding-right: 20px;
     cursor: pointer;
 }
+
 .rca-switch span.active {
     color: #4d4d4d;
 }
+
 .rca-switch.filled {
     border: 1px solid #1eb848;
     display: inline-block;
 }
+
 .rca-switch.filled span {
     border-right: 1px solid #1eb848;
     padding: 10px 20px;
 }
+
 .rca-switch.filled span:last-child {
     border-right: none;
 }
+
 .rca-switch.filled span.active {
     background-color: #1eb848;
     color: #fff;
@@ -794,19 +1083,24 @@ button {
     font-size: 16px;
     border: 1px solid #f1f1f1;
 }
+
 .rca-history-info .rca-row {
     display: table;
 }
+
 .rca-history-info .rca-row:first-child .rca-history-title {
     padding-top: 30px;
 }
+
 .rca-history-info .rca-row:last-child .rca-history-title {
     padding-bottom: 30px;
 }
+
 .rca-history-info .rca-col {
     padding: 15px 20px;
     display: table-cell;
 }
+
 .rca-history-info .rca-history-title {
     width: 150px;
     padding: 15px 20px;
@@ -817,6 +1111,7 @@ button {
     font-size: 18px;
     padding-bottom: 20px;
 }
+
 .rca-team-score .team {
     min-width: 100px;
     display: inline-block;
@@ -827,6 +1122,7 @@ button {
     min-height: 100px;
     border: 1px solid #f1f1f1;
 }
+
 .rca-man-match h3,
 .rca-match-start h3 {
     background-color: #f1f1f1;
@@ -836,11 +1132,13 @@ button {
     line-height: 20px;
     font-weight: 300;
 }
+
 .rca-man-match h3 span,
 .rca-match-start h3 span {
     color: #f9690e;
     margin-left: 7px;
 }
+
 .rca-man-match .rca-padding,
 .rca-match-start .rca-padding {
     padding: 10px 20px;
@@ -849,6 +1147,7 @@ button {
 .rca-match-start {
     text-align: center;
 }
+
 .rca-match-start h2 {
     color: #f9690e;
     font-size: 30px;
@@ -858,6 +1157,7 @@ button {
 .rca-man-match-record {
     margin: 10px 0px;
 }
+
 .rca-man-match-record .title {
     min-width: 150px;
     display: inline-block;
@@ -870,6 +1170,7 @@ button {
     padding: 20px;
     margin: 0 auto;
 }
+
 .rca-teams .team {
     padding: 0px 20px;
     width: 150px;
@@ -882,6 +1183,7 @@ button {
     margin-bottom: 10px;
     line-height: 20px;
 }
+
 .rca-player-detail .rca-player {
     min-width: 100px;
 }
@@ -889,6 +1191,7 @@ button {
 .rca-wicket-falls {
     padding-left: 20px;
 }
+
 .rca-wicket-falls li {
     margin-bottom: 10px;
 }
@@ -897,24 +1200,29 @@ button {
     padding: 0;
     border-bottom: none;
 }
+
 .rca-multi-season > .rca-tab-list li {
     font-size: 12px;
     padding: 0 5px;
     margin: 0;
     color: #b3b3b3;
 }
+
 .rca-multi-season > .rca-tab-list li .rca-live-label::before {
     display: none;
 }
+
 .rca-multi-season > .rca-tab-list li:hover,
 .rca-multi-season > .rca-tab-list li:focus {
     color: #4d4d4d;
     border-bottom: none;
 }
+
 .rca-multi-season > .rca-tab-list li.active {
     color: #4d4d4d;
     border-bottom: none;
 }
+
 .rca-multi-season > .rca-tab-list li.active .rca-live-label::before {
     display: inline-block;
 }
@@ -923,10 +1231,12 @@ button {
     padding: 0;
     border-bottom: none;
 }
+
 .rca-squad-season > .rca-tab-list li:hover,
 .rca-squad-season > .rca-tab-list li:focus {
     border-bottom-color: transparent;
 }
+
 .rca-squad-season > .rca-tab-list li.active {
     border-bottom-color: transparent;
 }
@@ -949,6 +1259,7 @@ button {
 .rca-stats .rca-bowling-score .rca-col {
     width: 12%;
 }
+
 .rca-stats .rca-batting-score .rca-col.rca-player,
 .rca-stats .rca-bowling-score .rca-col.rca-player {
     width: 20%;
@@ -958,10 +1269,12 @@ button {
     font-size: 15px;
     font-weight: bold;
 }
+
 .rca-stats .rca-match-start h3.top-bowl {
     background-color: #602d91;
     color: #fff;
 }
+
 .rca-stats .rca-match-start h3.top-score {
     background-color: #f9690e;
     color: #fff;
@@ -981,20 +1294,25 @@ button {
 .rca-stats .rca-name-tag {
     margin: 10px 0;
 }
+
 .rca-stats .rca-name-tag .rca-name-info {
     width: 150px;
 }
+
 .rca-stats .rca-name-tag .rca-tag-info {
     color: #7d7d7d;
 }
+
 .rca-stats .rca-name-tag .rca-name-score {
     color: #f9690e;
     text-align: right;
 }
+
 .rca-stats .rca-name-tag .rca-table {
     padding: 5px;
     border-bottom: 1px solid #f1f1f1;
 }
+
 .rca-stats .rca-name-tag .rca-table:last-child {
     border-bottom: none;
 }
@@ -1007,9 +1325,11 @@ button {
     height: 90px;
     display: block;
 }
+
 .rca-ad-block.vertical-sm {
     height: 150px;
 }
+
 .rca-ad-block.vertical-lg {
     height: 250px;
 }
@@ -1019,10 +1339,12 @@ button {
     padding: 10px 0px;
     font-weight: normal;
 }
+
 .rca-logo h2 span {
     vertical-align: middle;
     display: inline-block;
 }
+
 .rca-logo h2 img {
     max-width: 100%;
     max-height: 50px;
@@ -1037,12 +1359,14 @@ button {
     background-color: #fff;
     margin: 10px 0px;
 }
+
 .rca-news-widget h3 {
     background-color: #d91e18;
     padding: 5px 5px 5px 10px;
     color: #fff;
     margin: 0px;
 }
+
 .rca-news-widget img {
     margin-right: 15px;
     border-radius: 3px;
@@ -1052,20 +1376,25 @@ button {
     border-bottom: 1px solid #b3b3b3;
     margin-bottom: 10px;
 }
+
 .rca-post h4 {
     margin: 5px 0 0 0;
 }
+
 .rca-post p {
     margin: 15px 0 5px 0;
 }
+
 .rca-post p img {
     margin-top: 5px;
 }
+
 .rca-post .rca-post-info {
     color: #b3b3b3;
     margin-top: 5px;
     font-size: 13px;
 }
+
 .rca-post .rca-post-desc img {
     max-width: 100%;
     margin: 10px 0 0 0;
@@ -1076,10 +1405,12 @@ button {
     text-align: center;
     background-color: #b3b3b3;
 }
+
 .rca-blog-image img {
     max-width: 100%;
     max-height: 300px;
 }
+
 .rca-blog-image .rca-blog-head {
     position: absolute;
     bottom: 3px;
@@ -1092,6 +1423,7 @@ button {
 .rca-footer {
     padding: 10px 0;
 }
+
 .rca-footer li {
     display: inline-block;
     padding: 0 5px;
@@ -1122,21 +1454,26 @@ button {
         width: 100%;
         padding: 0;
     }
+
     .rca-mini-widget.rca-stats {
         min-width: 0;
     }
+
     .rca-hide-mobile {
         display: none !important;
     }
+
     .rca-stats .rca-name-tag .rca-name-info {
         width: 100px;
     }
+
     .rca-menu-scroll .rca-season-list > li {
         float: left;
         width: 33.33%;
         border-right: 1px solid #e6e6e6;
         border-bottom: 1px solid #e6e6e6;
     }
+
     .rca-menu-scroll .rca-season-list > li:nth-child(3),
     .rca-menu-scroll .rca-season-list > li:nth-child(6),
     .rca-menu-scroll .rca-season-list > li:nth-child(9),
@@ -1173,6 +1510,7 @@ button {
     .rca-column-12 {
         float: left;
     }
+
     .rca-hide-desk {
         display: none !important;
     }

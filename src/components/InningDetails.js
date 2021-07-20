@@ -12,8 +12,11 @@ function InningDetails({ inning }) {
         if (batsman.wicketDetails.type === BOWLED || batsman.wicketDetails.type === LBW) {
             wicketDetails = `${batsman.wicketDetails.type} ${batsman.wicketDetails.bowler}`
         }
-        if (batsman.wicketDetails.type === RUN_OUT || batsman.wicketDetails.type === CAUGHT_BY || batsman.wicketDetails.type === STUMPED) {
+        if (batsman.wicketDetails.type === RUN_OUT || batsman.wicketDetails.type === STUMPED) {
             wicketDetails = `${batsman.wicketDetails.type} ${batsman.wicketDetails.outBy}`
+        }
+        if (batsman.wicketDetails.type === CAUGHT_BY) {
+            wicketDetails = `${batsman.wicketDetails.type} ${batsman.wicketDetails.outBy} B ${batsman.wicketDetails.bowler}`
         }
         if (batsman.wicketDetails.type === HIT_WICKET || batsman.wicketDetails.type === FIELD_OBSTRUCT) {
             wicketDetails = `${batsman.wicketDetails.type}`
@@ -26,7 +29,7 @@ function InningDetails({ inning }) {
             <>
                 <TabView style={{ fontFamily: "Lato, Verdana, Helvetica, sans-serif" }}>
                     <TabPanel header="Scorecard">
-                        <div style={{ maxHeight: '350px', overflowY: 'scroll' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
+                        <div style={{ maxHeight: '350px', overflowY: 'scroll' }} class="rca-padding rca-no-top-padding rca-no-bottom-padding">
                             <div class="rca-batting-score rca-padding ">
                                 <h3>{inning.battingTeam} Batting: <strong> {inning.totalScore}/{inning.totalWickets} in {getTotalOvers(inning.overs)} Overs</strong></h3>
                                 <div class="rca-row">
@@ -34,7 +37,7 @@ function InningDetails({ inning }) {
                                         <div class="rca-col rca-player">
                                             Batsmen
                                         </div>
-                                        <div class="rca-col">
+                                        <div class="rca-col rca-player">
                                         </div>
                                         <div class="rca-col">
                                             Runs
@@ -67,7 +70,7 @@ function InningDetails({ inning }) {
                                                     <div class="rca-col rca-player">
                                                         {batsman.name}
                                                     </div>
-                                                    <div class="rca-col">
+                                                    <div class="rca-col rca-player">
                                                         {wicketDetails ? wicketDetails : <span style={{ color: '#2196F3' }}>{status}</span>}
                                                     </div>
                                                     <div class="rca-col">
@@ -200,12 +203,12 @@ function InningDetails({ inning }) {
                         </div>
                     </TabPanel>
                     <TabPanel header="Partnerships">
-                        <div style={{ maxHeight: '350px', overflowY: 'auto' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
+                        <div style={{ maxHeight: '350px', overflowY: 'auto' }} class="rca-padding rca-no-top-padding rca-no-bottom-padding">
                             <Partnerships inning={inning}></Partnerships>
                         </div>
                     </TabPanel>
                     <TabPanel header="Runs Per Over">
-                        <div style={{ maxHeight: '350px', overflowY: 'auto' }} class="rca-tab-content rca-padding rca-no-top-padding rca-no-bottom-padding active">
+                        <div style={{ maxHeight: '350px', overflowY: 'auto' }} class="rca-padding rca-no-top-padding rca-no-bottom-padding">
                             <RunsVsOversBarChart overs={inning.overs}></RunsVsOversBarChart>
                         </div>
                     </TabPanel>
