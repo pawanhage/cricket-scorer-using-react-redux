@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Chips } from 'primereact/chips'
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
@@ -6,19 +6,33 @@ import { Dropdown } from 'primereact/dropdown';
 import { insertMatchDetails, updateInnings } from '../redux';
 import { connect } from 'react-redux';
 import { useHistory } from "react-router-dom";
-import { MOCK_TEAM_1, MOCK_TEAM_2, ONE_DAY_MATCH, TEST_MATCH } from '../constants';
+import { ONE_DAY_MATCH, TEST_MATCH } from '../constants';
 import { formInning } from '../utils/cricketUtils';
 
 function MatchDetails({ insertMatchDetails, updateInnings }) {
 
-    const [firstTeamName, setFirstTeamName] = useState(MOCK_TEAM_1.name);
-    const [secondTeamName, setSecondTeamName] = useState(MOCK_TEAM_2.name);
-    const [matchType, setMatchType] = useState(ONE_DAY_MATCH);
-    const [totalOversPerInning, setTotalOvers] = useState(5);
-    const [firstTeamPlayers, setFirstTeamPlayers] = useState(MOCK_TEAM_1.players);
-    const [secondTeamPlayers, setSecondTeamPlayers] = useState(MOCK_TEAM_2.players);
-    const [tossResult, setTossResult] = useState(121);
-    const [maxOversPerBowler, setMaxOversPerBowler] = useState(1);
+    const [firstTeamName, setFirstTeamName] = useState(null);
+    const [secondTeamName, setSecondTeamName] = useState(null);
+    const [matchType, setMatchType] = useState(null);
+    const [totalOversPerInning, setTotalOvers] = useState(null);
+    const [firstTeamPlayers, setFirstTeamPlayers] = useState(null);
+    const [secondTeamPlayers, setSecondTeamPlayers] = useState(null);
+    const [tossResult, setTossResult] = useState(null);
+    const [maxOversPerBowler, setMaxOversPerBowler] = useState(null);
+
+    const [disableSaveOption, setDisableSaveOption] = useState(true);
+
+    useEffect(() => {
+        if (!(firstTeamName && secondTeamName && matchType && totalOversPerInning && firstTeamPlayers && secondTeamPlayers && tossResult && maxOversPerBowler)) {
+            setDisableSaveOption(true);
+        } else {
+            if (firstTeamPlayers.length !== secondTeamPlayers.length) {
+                setDisableSaveOption(true);
+            } else {
+                setDisableSaveOption(false);
+            }
+        }
+    }, [firstTeamName, secondTeamName, matchType, totalOversPerInning, firstTeamPlayers, secondTeamPlayers, tossResult, maxOversPerBowler]);
 
     let history = useHistory();
 
@@ -105,7 +119,7 @@ function MatchDetails({ insertMatchDetails, updateInnings }) {
                 <Chips value={secondTeamPlayers} max={11} onChange={(e) => setSecondTeamPlayers(e.value)} />
             </div>
             <div className="p-fluid">
-                <Button type="button" label="Start Match" className="p-mt-5" onClick={() => setMatchDetails()} />
+                <Button type="button" disabled={disableSaveOption} label="Start Match" className="p-mt-5" onClick={() => setMatchDetails()} />
             </div>
         </div>
     )
